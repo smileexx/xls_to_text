@@ -1,0 +1,203 @@
+<?php
+
+/**
+ * Created by PhpStorm.
+ * User: Igor
+ * Date: 14.11.2016
+ * Time: 2:05
+ */
+
+require_once( __DIR__ . '/../libs/ExcelToCsv.php' );
+
+class ControllerXml
+{
+    private static $file_types = array(
+        'csv' => 'csv',
+        'xls' => 'application/vnd.ms-excel',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+
+    private static $file_param = 'xml';
+
+    private $uploaddir = '';
+
+
+    function index()
+    {
+        try {
+
+            // Undefined | Multiple Files | $_FILES Corruption Attack
+            // If this request falls under any of them, treat it invalid.
+            if (
+                !isset( $_FILES[self::$file_param]['error'] ) ||
+                is_array( $_FILES[self::$file_param]['error'] )
+            ) {
+                throw new RuntimeException( 'Invalid parameters.' );
+            }
+
+            // Check $_FILES[self::$file_param]['error'] value.
+            switch ( $_FILES[self::$file_param]['error'] ) {
+                case UPLOAD_ERR_OK:
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    throw new RuntimeException( 'No file sent.' );
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    throw new RuntimeException( 'Exceeded filesize limit.' );
+                default:
+                    throw new RuntimeException( 'Unknown errors.' );
+            }
+
+            // You should also check filesize here. 
+            if ( $_FILES[self::$file_param]['size'] > 2097152 ) {
+                throw new RuntimeException( 'Exceeded filesize limit.' );
+            }
+
+            if ( false === $ext = array_search( $_FILES[self::$file_param]['type'], self::$file_types, true ) ) {
+                throw new RuntimeException( 'Invalid file format.' );
+            }
+
+            // You should name it uniquely.
+            // DO NOT USE $_FILES[self::$file_param]['name'] WITHOUT ANY VALIDATION !!
+            // On this example, obtain safe unique name from its binary data.
+            $new_name = sprintf( UPLOAD_DIR . '%s_%s.%s',
+                sha1_file( $_FILES[self::$file_param]['tmp_name'] ),
+                date('Y-m-d_H-i-s', time()),
+                $ext
+            );
+            if ( !move_uploaded_file( $_FILES[self::$file_param]['tmp_name'], $new_name ) ) {
+                throw new RuntimeException( 'Failed to move uploaded file.' );
+            }
+
+
+            switch ( $_POST['type'] ) {
+                case 0:
+                    $this->parse_aqua( $new_name );
+                    break;
+                case 1:
+                    $this->parse_bulbash( $new_name );
+                    break;
+                case 2:
+                    $this->parse_ubm( $new_name );
+                    break;
+            }
+
+        } catch ( RuntimeException $e ) {
+
+            echo $e->getMessage();
+
+        }
+
+    }
+
+    private function parse_aqua( $file )
+    {
+        $schema = [
+            [
+                'sheet_id' => 0,
+                'sheet_name' => '',
+
+                'first_row' => 13,
+                'last_row' => 0,
+
+                'columns' => [
+                    0 => [
+                        'input_col' => 1,
+                        'type' => 'article'
+                    ],
+                    1 => [
+                        'input_col' => 3,
+                        'type' => 'amount'
+                    ]
+                ]
+            ]
+        ];
+
+        $opt = ['out_folder'=>DOWNLOAD_DIR];
+
+        $format = "%s - 0 - %s";
+
+        $Convertor = new ExcelToCsv( $schema, $opt, $format );
+        $Convertor->convert( $file );
+
+
+    }
+
+    private function parse_ubm( $file )
+    {
+
+        $schema = [
+            [
+                'sheet_id' => 0,
+                'sheet_name' => '',
+
+                'first_row'         => 16,
+                'last_row'          => 0,
+
+                'columns'   => [
+                    0 => [
+                        'input_col' => 6,
+                        'type' => 'article'
+                    ],
+                    1 => [
+                        'input_col' => 9,
+                        'type' => 'amount',
+                        'literal' => true
+                    ]
+                ]
+            ]
+        ];
+
+        $opt = ['out_folder'=>DOWNLOAD_DIR];
+
+        $format = "%s - 0 - %s";
+
+        $Convertor = new ExcelToCsv( $schema, $opt, $format );
+        $Convertor->convert( $file );
+    }
+
+    private function parse_bulbash( $file )
+    {
+
+        $sheet_patern = [
+            'sheet_id' => 0,
+            'sheet_name' => '',
+
+            'first_row'         => 2,
+            'last_row'          => 0,
+
+            'columns'   => [
+                0 => [
+                    'input_col' => 0,
+                    'type' => 'article',
+                    'reg' => '/^\/?(.*?)\//'
+                ],
+                1 => [
+                    'input_col' => 3,
+                    'type' => 'amount'
+                ]
+            ]
+        ];
+
+        $schema = [];
+
+        $opt = ['out_folder'=>DOWNLOAD_DIR];
+
+        $format = "%s - 0 - %s";
+
+        $Convertor = new ExcelToCsv( $schema, $opt, $format );
+
+        $sheets = $Convertor->getAllSheets( $file );
+
+        foreach ( $sheets as $key => $sheet ) {
+            $schema[$key] = $sheet_patern;
+            $schema[$key]['sheet_id'] = $key;
+        }
+
+        $Convertor->setSchema( $schema );
+
+        $Convertor->convert( $file );
+
+    }
+
+}

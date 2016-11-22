@@ -1,0 +1,5 @@
+Options +Indexes
+
+<FilesMatch "/download/\.(?i:doc|odf|pdf|rtf|txt)$">
+  Header set Content-Disposition attachment
+</FilesMatch>

@@ -1,0 +1,7 @@
+<?php
+define( 'HOST', 'http://host.name/');
+define( 'BOL', "\r" );
+define( 'NEW_LINE', "\r\n" );
+define( 'UPLOAD_DIR', __DIR__ . '/pub/upload/' );
+define( 'DOWNLOAD_DIR', __DIR__ . '/pub/download/' );
+define( 'DOWNLOAD_URL', HOST . 'pub/download/' );
