@@ -17,9 +17,6 @@
     <div id="main-content">
         <?php include 'app/view/' . $content_view; ?>
     </div>
-    <footer  class="footer">
-        <div></div>
-    </footer>
     <footer id="main-footer" class="footer">
         <div class="container">
             <p class="text-muted">powered by smileexx © 2016</p>

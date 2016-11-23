@@ -126,28 +126,29 @@ Class ExcelToCsv
 
     /**
      * Convert - Main execution function
+     * @param $file_path
+     * @return array
      */
     function convert( $file_path )
     {
+        $pricelist = [];
         if ( !file_exists( $file_path ) ) {
             $this->pr( "ERROR. File '$file_path' not found!" );
-            return false;
+            return $pricelist;
         }
         try {
+
             $objPHPExcel = PHPExcel_IOFactory::load( $file_path );
 
             //TODO check rows count before file open
             $new_file_path = $this->generateOutFilePath( $file_path );
 
-            $download_link = $this->generateDownloadLink( $file_path );
-
-            echo( "<a href=\"$download_link\" target=\"_blank\">$download_link</a><br /><hr>" );
 
             $f = fopen( $new_file_path, 'w' );
             fwrite( $f, chr( 239 ) . chr( 187 ) . chr( 191 ) );
 
 
-
+            $cc = 0;
             foreach ( $this->schema as $sheet_setting ) {
 
                 $sheet = null;
@@ -172,7 +173,7 @@ Class ExcelToCsv
                 }
 
                 // $this->prProgress( 0, $last_row );
-                for ( $i = $first_row; $i <= $last_row; $i++ ) {
+                for ( $i = $first_row; $i <= $last_row; $i++, $cc ++ ) {
                     $skip = false;
                     $str_arr = [];
                     foreach ( $sheet_setting['columns'] as $s_key => $s_val ) {
@@ -182,6 +183,7 @@ Class ExcelToCsv
                         switch ( $s_val['type'] ) {
                             case 'article':
                                 $value = $sheet->getCellByColumnAndRow( $s_val['input_col'], $i )->getValue();
+                                $str_arr['article'] = $value;
                                 if ( isset($s_val['reg']) ) {
                                     if ( preg_match( $s_val['reg'], $value, $matches ) ) {
                                         $value = $matches[1];
@@ -200,6 +202,7 @@ Class ExcelToCsv
                                 break;
                             case 'amount':
                                 $value = $sheet->getCellByColumnAndRow( $s_val['input_col'], $i )->getValue();
+                                $str_arr['amount'] = $value;
                                 if ( !empty($s_val['literal']) ) {
                                     if(isset($this->amount_format[$value])){
                                         $value = $this->amount_format[$value];
@@ -235,7 +238,8 @@ Class ExcelToCsv
 
                     // $this->pr( $str );
                     fwrite( $f, $str . NEW_LINE );
-                    echo($str . '<br />' );
+                    $pricelist[$cc] = $str_arr;
+                    // echo($str . '<br />' );
                     // $this->prProgress( $i, $last_row );
                 }
                 unset($sheet);
@@ -243,6 +247,7 @@ Class ExcelToCsv
 
             unset( $objPHPExcel );
             fclose( $f );
+            return $pricelist;
         } catch ( Exception $err ) {
             if ( $f ) {
                 fclose( $f );
@@ -251,6 +256,7 @@ Class ExcelToCsv
             $this->pr( $err->getMessage() );
             unset( $sheet );
             unset( $objPHPExcel );
+            return $pricelist;
         }
     }
 

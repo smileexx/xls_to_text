@@ -9,7 +9,7 @@
 
 require_once( __DIR__ . '/../libs/ExcelToCsv.php' );
 
-class ControllerXml
+class ControllerXml extends Controller
 {
     private static $file_types = array(
         'csv' => 'csv',
@@ -69,18 +69,38 @@ class ControllerXml
                 throw new RuntimeException( 'Failed to move uploaded file.' );
             }
 
+            $product = file_get_contents('http://robins.com.ua/gethashedproducts.php');
+            $product = json_decode($product, true);
+
+            $new_products = [];
+            $duplicate = [];
+
+            foreach($product['success'] as $key => $value) {
+                $hash = $value['hashed'];
+                if( in_array( $hash, $new_products ) ) {
+                    $duplicate[$hash][] = $key ;
+                }
+                $new_products[$hash] = $key;
+            }
+
+            unset($product);
+            /*var_dump($new_products);
+            var_dump($duplicate);*/
+
 
             switch ( $_POST['type'] ) {
                 case 0:
-                    $this->parse_aqua( $new_name );
+                    $this->parse_aqua( $new_name, $new_products, $duplicate );
                     break;
                 case 1:
-                    $this->parse_bulbash( $new_name );
+                    $this->parse_bulbash( $new_name, $new_products, $duplicate );
                     break;
                 case 2:
-                    $this->parse_ubm( $new_name );
+                    $this->parse_ubm( $new_name, $new_products, $duplicate );
                     break;
             }
+            unset($new_array);
+            unset($duplicate);
 
         } catch ( RuntimeException $e ) {
 
@@ -90,7 +110,7 @@ class ControllerXml
 
     }
 
-    private function parse_aqua( $file )
+    private function parse_aqua( $file, $hash_product, $duplicate )
     {
         $schema = [
             [
@@ -118,12 +138,18 @@ class ControllerXml
         $format = "%s - 0 - %s";
 
         $Convertor = new ExcelToCsv( $schema, $opt, $format );
-        $Convertor->convert( $file );
+        $pricelist = $Convertor->convert( $file );
 
-
+        $download_link = $Convertor->generateDownloadLink( $file );
+        $this->view->generate( '_common.php', 'xml_result.php', [
+            'pricelist' => $pricelist,
+            'hash_product' => $hash_product,
+            'download_link' => $download_link,
+            'duplicate' => $duplicate
+        ] );
     }
 
-    private function parse_ubm( $file )
+    private function parse_ubm( $file, $hash_product, $duplicate )
     {
 
         $schema = [
@@ -153,10 +179,18 @@ class ControllerXml
         $format = "%s - 0 - %s";
 
         $Convertor = new ExcelToCsv( $schema, $opt, $format );
-        $Convertor->convert( $file );
+        $pricelist = $Convertor->convert( $file );
+
+        $download_link = $Convertor->generateDownloadLink( $file );
+        $this->view->generate( '_common.php', 'xml_result.php', [
+            'pricelist' => $pricelist,
+            'hash_product' => $hash_product,
+            'download_link' => $download_link,
+            'duplicate' => $duplicate
+        ] );
     }
 
-    private function parse_bulbash( $file )
+    private function parse_bulbash( $file, $hash_product, $duplicate  )
     {
 
         $sheet_patern = [
@@ -196,7 +230,15 @@ class ControllerXml
 
         $Convertor->setSchema( $schema );
 
-        $Convertor->convert( $file );
+        $pricelist = $Convertor->convert( $file );
+
+        $download_link = $Convertor->generateDownloadLink( $file );
+        $this->view->generate( '_common.php', 'xml_result.php', [
+            'pricelist' => $pricelist,
+            'hash_product' => $hash_product,
+            'download_link' => $download_link,
+            'duplicate' => $duplicate
+        ] );
 
     }
 
