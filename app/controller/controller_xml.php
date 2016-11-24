@@ -77,7 +77,7 @@ class ControllerXml extends Controller
 
             foreach($product['success'] as $key => $value) {
                 $hash = $value['hashed'];
-                if( in_array( $hash, $new_products ) ) {
+                if( isset( $new_products[$hash] ) ) {
                     $duplicate[$hash][] = $key ;
                 }
                 $new_products[$hash] = $key;
