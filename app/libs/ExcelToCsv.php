@@ -12,9 +12,11 @@ require_once dirname( __FILE__ ) . '/PHPExcel/Classes/PHPExcel/IOFactory.php';
 Class ExcelToCsv
 {
 
-    private $amount_format = [
-        'В наличии' => 50,
-        'Заканчивается' => 1
+    public $amount_format = [
+        'вналичии' => 50,
+        'заканчивается' => 1,
+        'да' => 10,
+        'нет' => 0,
     ];
 
     private $time_start = 0;
@@ -100,6 +102,12 @@ Class ExcelToCsv
     private $string_format = null;
 
     /**
+     * global variable of opened excel file
+     * @var null
+     */
+    private $phpExcel = null;
+
+    /**
      * ExcelToCsv constructor.
      * @param array $schema
      * @param array $options
@@ -123,6 +131,21 @@ Class ExcelToCsv
             $this->schema = $schema;
         }
     }
+
+    function getPhpExcel( $file_path ){
+        if ( !file_exists( $file_path ) ) {
+            $this->pr( "ERROR. File '$file_path' not found!" );
+            return false;
+        }
+        try{
+            $this->phpExcel = PHPExcel_IOFactory::load( $file_path );
+            return $this->phpExcel;
+        } catch (Exception $err){
+            $this->pr( "ERROR. Can't read file." );
+            return false;
+        }
+    }
+
 
     /**
      * Convert - Main execution function

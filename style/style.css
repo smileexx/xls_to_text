@@ -73,3 +73,24 @@ table {
 table, th, td {
     border: 1px solid black;
 }
+
+.result-table {
+    border: 8px double;
+    margin: 15px;
+    padding: 0 15px;
+}
+
+.result-table .row:nth-child(odd){
+    background-color: #efefef;
+}
+
+.result-table .row {
+    padding: 5px 0;
+}
+.result-table .row>div{
+    border-left: 1px solid;
+}
+
+.result-table .row>div:first-child{
+    border-left: none;
+}

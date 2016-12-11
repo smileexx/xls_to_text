@@ -79,24 +79,32 @@ class ControllerXml extends Controller
                 $hash = $value['hashed'];
                 if( isset( $new_products[$hash] ) ) {
                     $duplicate[$hash][] = $key ;
+                } else {
+                    $new_products[$hash] = $key;
                 }
-                $new_products[$hash] = $key;
             }
 
             unset($product);
             /*var_dump($new_products);
             var_dump($duplicate);*/
 
-
             switch ( $_POST['type'] ) {
-                case 0:
-                    $this->parse_aqua( $new_name, $new_products, $duplicate );
+                case 'aquademi':
+                    $this->parse_aquademi( $new_name, $new_products, $duplicate );
                     break;
-                case 1:
-                    $this->parse_bulbash( $new_name, $new_products, $duplicate );
+                case 'bulbashka':
+                    $this->parse_bulbashka( $new_name, $new_products, $duplicate );
                     break;
-                case 2:
+                case 'ubm':
                     $this->parse_ubm( $new_name, $new_products, $duplicate );
+                    break;
+                case 'antei':
+                    $this->parse_antei( $new_name, $new_products, $duplicate );
+                    break;
+                case 'armoni':
+                case 'germes':
+                case 'marko':
+                case 'metaplan':
                     break;
             }
             unset($new_array);
@@ -110,134 +118,63 @@ class ControllerXml extends Controller
 
     }
 
-    private function parse_aqua( $file, $hash_product, $duplicate )
+    private function parse_aquademi( $file, $hash_products, $duplicate )
     {
-        $schema = [
-            [
-                'sheet_id' => 0,
-                'sheet_name' => '',
+        require_once (dirname( __FILE__ ) . '/../libs/provider/aquademi.php');
 
-                'first_row' => 13,
-                'last_row' => 0,
+        $Converter = new Aquademi();
+        $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
-                'columns' => [
-                    0 => [
-                        'input_col' => 1,
-                        'type' => 'article'
-                    ],
-                    1 => [
-                        'input_col' => 3,
-                        'type' => 'amount'
-                    ]
-                ]
-            ]
-        ];
+        $download_link = $Converter->generateDownloadLink( $file );
 
-        $opt = ['out_folder'=>DOWNLOAD_DIR];
-
-        $format = "%s - 0 - %s";
-
-        $Convertor = new ExcelToCsv( $schema, $opt, $format );
-        $pricelist = $Convertor->convert( $file );
-
-        $download_link = $Convertor->generateDownloadLink( $file );
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
-            'hash_product' => $hash_product,
-            'download_link' => $download_link,
-            'duplicate' => $duplicate
+            'download_link' => $download_link
         ] );
     }
 
-    private function parse_ubm( $file, $hash_product, $duplicate )
+    private function parse_ubm( $file, $hash_products, $duplicate )
     {
+        require_once (dirname( __FILE__ ) . '/../libs/provider/ubm.php');
 
-        $schema = [
-            [
-                'sheet_id' => 0,
-                'sheet_name' => '',
+        $Converter = new Ubm();
+        $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
-                'first_row'         => 16,
-                'last_row'          => 0,
+        $download_link = $Converter->generateDownloadLink( $file );
 
-                'columns'   => [
-                    0 => [
-                        'input_col' => 6,
-                        'type' => 'article'
-                    ],
-                    1 => [
-                        'input_col' => 9,
-                        'type' => 'amount',
-                        'literal' => true
-                    ]
-                ]
-            ]
-        ];
-
-        $opt = ['out_folder'=>DOWNLOAD_DIR];
-
-        $format = "%s - 0 - %s";
-
-        $Convertor = new ExcelToCsv( $schema, $opt, $format );
-        $pricelist = $Convertor->convert( $file );
-
-        $download_link = $Convertor->generateDownloadLink( $file );
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
-            'hash_product' => $hash_product,
-            'download_link' => $download_link,
-            'duplicate' => $duplicate
+            'download_link' => $download_link
         ] );
     }
 
-    private function parse_bulbash( $file, $hash_product, $duplicate  )
+    private function parse_bulbashka( $file, $hash_products, $duplicate  )
     {
+        require_once (dirname( __FILE__ ) . '/../libs/provider/bulbashka.php');
 
-        $sheet_patern = [
-            'sheet_id' => 0,
-            'sheet_name' => '',
+        $Converter = new Bulbashka();
+        $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
-            'first_row'         => 2,
-            'last_row'          => 0,
+        $download_link = $Converter->generateDownloadLink( $file );
 
-            'columns'   => [
-                0 => [
-                    'input_col' => 0,
-                    'type' => 'article',
-                    'reg' => '/^\/?(.*?)\//'
-                ],
-                1 => [
-                    'input_col' => 3,
-                    'type' => 'amount'
-                ]
-            ]
-        ];
-
-        $schema = [];
-
-        $opt = ['out_folder'=>DOWNLOAD_DIR];
-
-        $format = "%s - 0 - %s";
-
-        $Convertor = new ExcelToCsv( $schema, $opt, $format );
-
-        $sheets = $Convertor->getAllSheets( $file );
-
-        foreach ( $sheets as $key => $sheet ) {
-            $schema[$key] = $sheet_patern;
-            $schema[$key]['sheet_id'] = $key;
-        }
-
-        $Convertor->setSchema( $schema );
-
-        $pricelist = $Convertor->convert( $file );
-
-        $download_link = $Convertor->generateDownloadLink( $file );
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
-            'hash_product' => $hash_product,
-            'download_link' => $download_link,
-            'duplicate' => $duplicate
+            'download_link' => $download_link
+        ] );
+
+    }
+    private function parse_antei( $file, $hash_products, $duplicate  )
+    {
+        require_once (dirname( __FILE__ ) . '/../libs/provider/antei.php');
+
+        $Converter = new Antei();
+        $pricelist = $Converter->process($file, $hash_products, $duplicate);
+
+        $download_link = $Converter->generateDownloadLink( $file );
+
+        $this->view->generate( '_common.php', 'xml_result.php', [
+            'pricelist' => $pricelist,
+            'download_link' => $download_link
         ] );
 
     }

@@ -14,13 +14,18 @@
             <label for="list-type" class="col-sm-3 control-label">Поставщик: </label>
             <div class="col-sm-9">
                 <select id="list-type" name="type" class="form-control">
-                    <option value="0">Aqua</option>
-                    <option value="1">Bulbash</option>
-                    <option value="2">UBM</option>
-                </select>
-            </div>
-        </div>
+                    <option value="aquademi">Аквадеми</option>
+                    <option value="antei">Антей</option>
+                    <option value="bulbashka">Бульбашка</option>
+                    <option value="ubm">УБМ</option>
+                    <!-- <option value="armoni">Армони</option>
+                     <option value="germes">Гермес</option>
+                     <option value="marko">Марко треви</option>
+                     <option value="metaplan">Метаплан(оптгрупп)</option> -->
+                 </select>
+             </div>
+         </div>
 
-        <button type="submit" class="btn btn-default">Загрузить</button>
-    </form>
-</div>
+         <button type="submit" class="btn btn-default">Загрузить</button>
+     </form>
+ </div>
