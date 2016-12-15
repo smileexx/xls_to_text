@@ -96,7 +96,7 @@ class Antei extends ExcelToCsv
             $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
         }
 
-        return $result;
+        return [ 'price' => $result ];
     }
 
 }

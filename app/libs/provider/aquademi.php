@@ -71,6 +71,7 @@ class Aquademi extends ExcelToCsv
 
         // returned object
         $result = [];
+        $result_skip = [];
 
         $objPhpExcel = $this->getPhpExcel( $file );
         // $allSheets = $objPhpExcel->getAllSheets();
@@ -92,6 +93,7 @@ class Aquademi extends ExcelToCsv
 
             $orig_amount = '';
             $orig_article = '';
+            $article_not_formated = null;
 
             $title = [];
 
@@ -108,6 +110,7 @@ class Aquademi extends ExcelToCsv
                         break;
                     case 'article':
                         $orig_article = $formated_value;
+                        $article_not_formated = $value;
                         $hash = $this->normalizeArticle( $formated_value );
                         break;
                     case 'block_type':
@@ -128,17 +131,19 @@ class Aquademi extends ExcelToCsv
             }
 
             if( !$current_block_type || !in_array($current_block_type, $this->blocks) || in_array($current_block_type, $this->skip_blocks) ){
-                printf("[Block]\t%s\t%s\t%s\t%s".PHP_EOL, $current_block_type, $orig_article, $hash, implode( ', ', $title )) ;
+                $result_skip[] = sprintf("[Block]\t%s\t%s\t%s\t%s<br>".PHP_EOL, $current_block_type, $orig_article, $hash, implode( ', ', $title )) ;
                 continue;
             }
             if( !$current_vendor || !in_array($current_vendor, $this->vendors) ){
-                printf("[Vendor]\t%s\t%s\t%s".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
+                $result_skip[] = sprintf("[Vendor]\t%s\t%s\t%s<br>".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
                 continue;
             }
-            if( !$hash ){
-                printf("[Hash]\t%s\t%s\t%s".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
+            if( empty($hash) || $hash === 'null' || empty($article_not_formated) ){
+                $result_skip[] = sprintf("[Hash]\t%s\t%s\t%s<br>".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
                 continue;
             }
+
+            $result[$i]['vendor'] = $current_vendor;
 
             $result[$i]['amount'] = $amount;
             $result[$i]['article'] = $hash;
@@ -151,7 +156,7 @@ class Aquademi extends ExcelToCsv
             $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
         }
 
-        return $result;
+        return [ 'price' => $result, 'error' => $result_skip ];
     }
 
 }

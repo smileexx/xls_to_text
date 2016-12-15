@@ -91,7 +91,7 @@ class Bulbashka extends ExcelToCsv
                 $result[$common_count]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash] ) : '';
             }
         }
-        return $result;
+        return [ 'price' => $result ];
     }
 
 }
