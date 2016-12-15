@@ -4,13 +4,43 @@ require_once( dirname( __FILE__ ) . '/../ExcelToCsv.php' );
 
 class Aquademi extends ExcelToCsv
 {
+    private $vendors = [
+        'Agrobbuhtal',
+        'Dornbracht',
+        'Duravit',
+        'Duscholux',
+        'EMCO',
+        'Geberit',
+        'Grohe',
+        'Grohe DIY',
+        'Grohe Spa',
+        'HUPPE New',
+        'Hansgrohe',
+        'Hatria',
+        'Instal-Projekt',
+        'Jika',
+        'Kaldewei',
+        'Keuco',
+        'Kolo',
+        'Laufen',
+        'Ravak',
+        'Sanit',
+        'Simas',
+        'Steuler',
+        'Tres',
+        'Villeroy and Boch',
+        'Zehnder',
+    ];
+
+    private $blocks = [ 'Основной', 'Склад №2', 'Распродажа' ];
+    private $skip_blocks = [ 'Распродажа' ];
 
     function process( $file, $hashed_products, $duplicate_hashes )
     {
         // settings
         $sheet_id = 0;
 
-        $first_row = 13;
+        $first_row = 10;
         $last_row = 0;
 
 //        $first_column = 1;
@@ -28,6 +58,14 @@ class Aquademi extends ExcelToCsv
             2 => [
                 'input_col' => 2,
                 'type' => 'title',
+            ],
+            3 => [
+                'input_col' => 2,
+                'type' => 'vendor',
+            ],
+            4 => [
+                'input_col' => 2,
+                'type' => 'block_type',
             ]
         ];
 
@@ -45,9 +83,12 @@ class Aquademi extends ExcelToCsv
             return $result;
         }
 
+        $current_block_type = null;
+        $current_vendor = null;
+
         for ( $i = $first_row; $i <= $last_row; $i++ ) {
             $amount = 0;
-            $hash = '';
+            $hash = null;
 
             $orig_amount = '';
             $orig_article = '';
@@ -57,19 +98,48 @@ class Aquademi extends ExcelToCsv
             foreach ( $columns as $column ) {
                 $phpCell = $sheet->getCellByColumnAndRow( $column['input_col'], $i );
 
-                if ( $column['type'] == 'amount' ) {
-                    $amount = $phpCell->getValue();
-                    $orig_amount = $phpCell->getFormattedValue();
-                } else {
-                    $cell_val = $phpCell->getFormattedValue();
-                    if ( $column['type'] == 'article' ) {
-                        $orig_article = $cell_val;
-                        $hash = $this->normalizeArticle( $cell_val );
-                    } else {
-                        $title[] = $cell_val;
-                    }
+                $value = $phpCell->getValue();
+                $formated_value = $phpCell->getFormattedValue();
+
+                switch($column['type']){
+                    case 'amount':
+                        $amount = $value;
+                        $orig_amount = $formated_value;
+                        break;
+                    case 'article':
+                        $orig_article = $formated_value;
+                        $hash = $this->normalizeArticle( $formated_value );
+                        break;
+                    case 'block_type':
+                        if( in_array($formated_value, $this->blocks) ) {
+                            $current_block_type = $formated_value;
+                        }
+                        break;
+                    case 'vendor':
+                        if( in_array($formated_value, $this->vendors) ) {
+                            $current_vendor = $formated_value;
+                        }
+                        break;
+                    default:
+                        $title[] = $formated_value;
+                        break;
                 }
+
             }
+
+            if( !$current_block_type || !in_array($current_block_type, $this->blocks) || in_array($current_block_type, $this->skip_blocks) ){
+                printf("[Block]\t%s\t%s\t%s\t%s".PHP_EOL, $current_block_type, $orig_article, $hash, implode( ', ', $title )) ;
+                continue;
+            }
+            if( !$current_vendor || !in_array($current_vendor, $this->vendors) ){
+                printf("[Vendor]\t%s\t%s\t%s".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
+                continue;
+            }
+            if( !$hash ){
+                printf("[Hash]\t%s\t%s\t%s".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
+                continue;
+            }
+
             $result[$i]['amount'] = $amount;
             $result[$i]['article'] = $hash;
 
