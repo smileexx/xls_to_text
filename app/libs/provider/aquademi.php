@@ -4,32 +4,40 @@ require_once( dirname( __FILE__ ) . '/../ExcelToCsv.php' );
 
 class Aquademi extends ExcelToCsv
 {
-    private $vendors = [
-        'Agrobbuhtal',
-        'Dornbracht',
-        'Duravit',
-        'Duscholux',
-        'EMCO',
-        'Geberit',
-        'Grohe',
-        'Grohe DIY',
-        'Grohe Spa',
-        'HUPPE New',
-        'Hansgrohe',
-        'Hatria',
-        'Instal-Projekt',
-        'Jika',
-        'Kaldewei',
-        'Keuco',
-        'Kolo',
-        'Laufen',
-        'Ravak',
-        'Sanit',
-        'Simas',
-        'Steuler',
-        'Tres',
-        'Villeroy and Boch',
-        'Zehnder',
+    private $vendors = array (
+        'agrobbuhtal',
+        'dornbracht',
+        'duravit',
+        'duscholux',
+        'emco',
+        'geberit',
+        'grohe',
+        'grohe diy',
+        'grohe spa',
+        'huppe new',
+        'hansgrohe',
+        'hatria',
+        'instal-projekt',
+        'jika',
+        'kaldewei',
+        'keuco',
+        'kolo',
+        'laufen',
+        'ravak',
+        'sanit',
+        'simas',
+        'steuler',
+        'tres',
+        'villeroy and boch',
+        'zehnder',
+    );
+
+    private $vendor_sinonim = [
+        'axor' => 'hansgrohe',
+        'hansgrohe' => 'axor',
+        'grohe diy' => 'grohe',
+        'grohe spa' => 'grohe',
+        'instal-projekt' => 'install projekt'
     ];
 
     private $blocks = [ 'Основной', 'Склад №2', 'Распродажа' ];
@@ -90,6 +98,7 @@ class Aquademi extends ExcelToCsv
         for ( $i = $first_row; $i <= $last_row; $i++ ) {
             $amount = 0;
             $hash = null;
+            $product_id = null;
 
             $orig_amount = '';
             $orig_article = '';
@@ -119,8 +128,9 @@ class Aquademi extends ExcelToCsv
                         }
                         break;
                     case 'vendor':
-                        if( in_array($formated_value, $this->vendors) ) {
-                            $current_vendor = $formated_value;
+                        $tmp_vendor = mb_strtolower($formated_value);
+                        if( in_array($tmp_vendor, $this->vendors) ) {
+                            $current_vendor = $tmp_vendor;
                         }
                         break;
                     default:
@@ -152,8 +162,26 @@ class Aquademi extends ExcelToCsv
             $result[$i]['orig_article'] = $orig_article;
 
             $result[$i]['title'] = implode( ', ', $title );
-            $result[$i]['product_id'] = ( isset( $hashed_products[$hash] ) ) ? $hashed_products[$hash] : '';
-            $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
+
+            // $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
+            if( isset( $duplicate_hashes[$hash] ) ){
+                $hash_duplicate = $duplicate_hashes[$hash];
+                foreach ( $hash_duplicate  as $item ) {
+                    $tmp_vend = mb_strtolower($item['vendor']);
+                    if( ($tmp_vend == $current_vendor) || ($tmp_vend == $this->vendor_sinonim[$current_vendor]) ){
+                        $product_id = $item['id'];
+                    }
+                }
+
+            }
+            if($product_id){
+                $result[$i]['product_id'] = $product_id;
+                $result[$i]['duplicate'] = '';
+            } else {
+                $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? var_export( $duplicate_hashes[$hash], true) : '';
+                $result[$i]['product_id'] = ( isset( $hashed_products[$hash] ) ) ? $hashed_products[$hash] : '';
+            }
+
         }
 
         return [ 'price' => $result, 'error' => $result_skip ];
