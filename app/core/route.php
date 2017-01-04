@@ -30,6 +30,19 @@ class Route
 
         // $action_name = 'action_'.$action_name;
 
+        // добавляем префиксы
+        $model_name = 'Model_'.$c_name;
+        // $action_name = 'action_'.$action_name;
+
+        // подцепляем файл с классом модели (файла модели может и не быть)
+
+        $model_file = strtolower($model_name).'.php';
+        $model_path = "app/model/".$model_file;
+        if(file_exists($model_path))
+        {
+            include "app/model/".$model_file;
+        }
+
         // подцепляем файл с классом контроллера
         $controller_file = strtolower($controller_file).'.php';
         $controller_path = "app/controller/".$controller_file;
