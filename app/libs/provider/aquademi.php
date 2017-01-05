@@ -168,7 +168,7 @@ class Aquademi extends ExcelToCsv
                 $hash_duplicate = $duplicate_hashes[$hash];
                 foreach ( $hash_duplicate  as $item ) {
                     $tmp_vend = mb_strtolower($item['vendor']);
-                    if( ($tmp_vend == $current_vendor) || ($tmp_vend == $this->vendor_sinonim[$current_vendor]) ){
+                    if( ($tmp_vend == $current_vendor) || ( isset($this->vendor_sinonim[$current_vendor]) && ($tmp_vend == $this->vendor_sinonim[$current_vendor]) ) ){
                         $product_id = $item['id'];
                     }
                 }

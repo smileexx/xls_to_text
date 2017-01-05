@@ -5,11 +5,13 @@
     <title>XML to Text converter</title>
     <link href="/style/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
     <link href="/style/bootstrap/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/style/bootstrap/js/bootstrap.min.js"></script>
     <link href="/style/style.css" type="text/css" rel="stylesheet">
 </head>
 <body>
-<div id="main-wrapper" class="">
-    <div id="main-menu" class="container">
+<div id="main-wrapper" >
+    <div id="main-menu" >
         <div class="menu-logo inline-flex">
             <h1>XML parser</h1>
         </div>
@@ -31,11 +33,11 @@
             <h2><?php echo $data['page_header']; ?></h2>
         <?php endif; ?>
     </div>
-    <div id="main-content">
+    <div id="main-content" class="container">
         <?php include 'app/view/' . $content_view; ?>
     </div>
     <footer id="main-footer" class="footer">
-        <div class="container">
+        <div class="">
             <p class="text-muted">powered by smileexx © 2017</p>
         </div>
     </footer>

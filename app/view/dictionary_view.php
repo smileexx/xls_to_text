@@ -1,4 +1,4 @@
-<div class="container">
+<div>
     <div id="dictionary-filter" class="form-group">
         <label for="list-type" class="col-sm-3 control-label">Поставщик: </label>
         <div class="col-sm-9">
@@ -26,3 +26,31 @@
         </div>
     </div>
 </div>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-success btn-lg add-item-btn-fixed" data-toggle="modal" data-target="#dictionary-item-edit-modal">Add</button>
+<!-- Modal -->
+<div class="modal fade" id="dictionary-item-edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="application/javascript">
+    $('#myModal').on('shown.bs.modal', function () {
+        $('#myInput').focus()
+    })
+</script>
