@@ -7,6 +7,7 @@
     <link href="/style/bootstrap/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet">
     <script src="/js/jquery.min.js"></script>
     <script src="/style/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/js/dictionary.js"></script>
     <link href="/style/style.css" type="text/css" rel="stylesheet">
 </head>
 <body>

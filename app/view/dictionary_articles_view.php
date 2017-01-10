@@ -1,5 +1,5 @@
 <div>
-    <div id="dictionary-filter" class="form-group">
+    <!--<div id="dictionary-filter" class="form-group">
         <label for="list-type" class="col-sm-3 control-label">Поставщик: </label>
         <div class="col-sm-9">
             <select id="list-type" name="type" class="form-control">
@@ -7,23 +7,22 @@
                 <option value="antei">Антей</option>
                 <option value="bulbashka">Бульбашка</option>
                 <option value="ubm">УБМ</option>
-                <!-- <option value="armoni">Армони</option>
+                 <option value="armoni">Армони</option>
                  <option value="germes">Гермес</option>
                  <option value="marko">Марко треви</option>
-                 <option value="metaplan">Метаплан(оптгрупп)</option> -->
+                 <option value="metaplan">Метаплан(оптгрупп)</option>
             </select>
         </div>
-    </div>
+    </div>-->
     <div class="dictionary-list">
         <div class="row">
-            <div class="col-xs-2">Hash</div>
-            <div class="col-xs-1">Orig. Article</div>
-            <div class="col-xs-1">ProductID</div>
-            <div class="col-xs-4">Orig. Title</div>
-            <div class="col-xs-4">Action</div>
+            <div class="col-xs-5">Income hash</div>
+            <div class="col-xs-2">Vendor</div>
+            <div class="col-xs-2">ProductID</div>
+            <div class="col-xs-2">Action</div>
         </div>
-        <div class="bad-items-list">
-            <?php echo $data['bad_list']; ?>
+        <div class="articles-list">
+            <?php echo $data['articles']; ?>
         </div>
     </div>
 </div>
@@ -46,7 +45,11 @@
                     </div>
                     <div class="form-group">
                         <label for="new-vendor">Vendor</label>
-                        <input type="text" class="form-control" id="new-vendor" name="vendor" placeholder="Vendor">
+                        <select class="form-control" id="new-vendor" name="vendor">
+                            <?php foreach ($data['vendors'] as $vendor) { ?>
+                                <option value="<?php echo $vendor['code']; ?>"><?php echo $vendor['title']; ?></option>
+                            <?php } ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="new-product-id">Product ID</label>

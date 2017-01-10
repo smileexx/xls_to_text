@@ -1,7 +1,5 @@
 <?php
 
-require_once( dirname( __FILE__ ) . '/../ExcelToCsv.php' );
-
 class Aquademi extends ExcelToCsv
 {
     private $vendors = array (
@@ -32,7 +30,7 @@ class Aquademi extends ExcelToCsv
         'zehnder',
     );
 
-    private $vendor_sinonim = [
+    private $vendor_synonym = [
         'axor' => 'hansgrohe',
         'hansgrohe' => 'axor',
         'grohe diy' => 'grohe',
@@ -80,6 +78,10 @@ class Aquademi extends ExcelToCsv
         // returned object
         $result = [];
         $result_skip = [];
+
+        $modelXml = new Model_Xml();
+
+        $allArticles = $modelXml->getAllArticles();
 
         $objPhpExcel = $this->getPhpExcel( $file );
         // $allSheets = $objPhpExcel->getAllSheets();
@@ -168,7 +170,7 @@ class Aquademi extends ExcelToCsv
                 $hash_duplicate = $duplicate_hashes[$hash];
                 foreach ( $hash_duplicate  as $item ) {
                     $tmp_vend = mb_strtolower($item['vendor']);
-                    if( ($tmp_vend == $current_vendor) || ( isset($this->vendor_sinonim[$current_vendor]) && ($tmp_vend == $this->vendor_sinonim[$current_vendor]) ) ){
+                    if( ($tmp_vend == $current_vendor) || ( isset($this->vendor_synonym[$current_vendor]) && ($tmp_vend == $this->vendor_synonym[$current_vendor]) ) ){
                         $product_id = $item['id'];
                     }
                 }
@@ -179,7 +181,16 @@ class Aquademi extends ExcelToCsv
                 $result[$i]['duplicate'] = '';
             } else {
                 $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? var_export( $duplicate_hashes[$hash], true) : '';
-                $result[$i]['product_id'] = ( isset( $hashed_products[$hash] ) ) ? $hashed_products[$hash] : '';
+                if ( isset( $hashed_products[$hash] ) ){
+                    $result[$i]['product_id'] = $hashed_products[$hash];
+                } else if ( isset($allArticles[$orig_article]) ){
+                    $dictVendor = $allArticles[$orig_article]['vendor'];
+                    if( ($dictVendor == $current_vendor) || ( isset($this->vendor_synonym[$current_vendor]) && ($dictVendor == $this->vendor_synonym[$current_vendor]) ) ){
+                        $result[$i]['product_id'] = $allArticles[$orig_article]['product_id'];
+                    }
+                } else {
+                    $result[$i]['product_id'] = '';
+                };
             }
 
         }

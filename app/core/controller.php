@@ -16,7 +16,14 @@ class Controller {
         $this->view = new View();
     }
 
+    function outputJson($data){
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
     function action_index()
     {
     }
+
+
 }
