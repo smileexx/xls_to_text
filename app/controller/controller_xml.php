@@ -75,15 +75,16 @@ class ControllerXml extends Controller
             $new_products = [];
             $duplicate = [];
 
-            foreach($product['success'] as $key => $value) {
+            foreach( $product['success'] as $key => $value ) {
                 $hash = $value['hashed'];
                 $vendor = $value['vendor'];
-                if( isset( $new_products[$hash] ) ) {
-                    $duplicate[$hash][] = ['id' => $key, 'vendor' => $vendor] ;
-                    $orig = $product['success'][$new_products[$hash]];
-                    $duplicate[$hash]['first'] = [ 'id' => $new_products[$hash], 'vendor' => $orig['vendor'] ];
+                $newKey = mb_strtolower($vendor, 'UTF-8') . $hash;
+                if( isset( $new_products[$newKey] ) ) {
+                    $duplicate[$newKey][] = [ 'id' => $key, 'vendor' => $vendor ];
+                    $orig = $product['success'][$new_products[$newKey]['id']];
+                    $duplicate[$newKey]['first'] = [ 'id' => $new_products[$newKey]['id'], 'vendor' => $orig['vendor'] ];
                 } else {
-                    $new_products[$hash] = $key;
+                    $new_products[$newKey] = [ 'id' => $key, 'vendor' => $vendor, 'hashed' => $hash ];
                 }
             }
 

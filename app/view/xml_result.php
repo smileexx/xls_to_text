@@ -30,7 +30,7 @@
     <h2>Skipped results</h2>
 </div>
 <?php
-if($data['pricelist']['error']){
+if( !empty($data['pricelist']['error']) ){
     foreach ($data['pricelist']['error'] as $key => $val){
         echo "<div>".$val."</div>";
     }

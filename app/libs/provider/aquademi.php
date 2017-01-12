@@ -2,33 +2,7 @@
 
 class Aquademi extends ExcelToCsv
 {
-    private $vendors = array (
-        'agrobbuhtal',
-        'dornbracht',
-        'duravit',
-        'duscholux',
-        'emco',
-        'geberit',
-        'grohe',
-        'grohe diy',
-        'grohe spa',
-        'huppe new',
-        'hansgrohe',
-        'hatria',
-        'instal-projekt',
-        'jika',
-        'kaldewei',
-        'keuco',
-        'kolo',
-        'laufen',
-        'ravak',
-        'sanit',
-        'simas',
-        'steuler',
-        'tres',
-        'villeroy and boch',
-        'zehnder',
-    );
+    private $vendors = [];
 
     private $vendor_synonym = [
         'axor' => 'hansgrohe',
@@ -80,7 +54,10 @@ class Aquademi extends ExcelToCsv
         $result_skip = [];
 
         $modelXml = new Model_Xml();
-
+        $tmpArrVendors = $modelXml->getAllVendors();
+        foreach ($tmpArrVendors as $val){
+            $this->vendors[] = $val['code'];
+        }
         $allArticles = $modelXml->getAllArticles();
 
         $objPhpExcel = $this->getPhpExcel( $file );
@@ -101,6 +78,7 @@ class Aquademi extends ExcelToCsv
             $amount = 0;
             $hash = null;
             $product_id = null;
+            $duplicate = '';
 
             $orig_amount = '';
             $orig_article = '';
@@ -130,7 +108,7 @@ class Aquademi extends ExcelToCsv
                         }
                         break;
                     case 'vendor':
-                        $tmp_vendor = mb_strtolower($formated_value);
+                        $tmp_vendor = mb_strtolower($formated_value, 'UTF-8');
                         if( in_array($tmp_vendor, $this->vendors) ) {
                             $current_vendor = $tmp_vendor;
                         }
@@ -155,27 +133,43 @@ class Aquademi extends ExcelToCsv
                 continue;
             }
 
-            $key = $current_vendor.$hash;
+            $vendor_hash_key = $current_vendor.$hash;
 
-            if(isset($result[$key])){
-                $result[$key]['amount'] = $result[$key]['amount'] + $amount;
-                $result[$key]['orig_amount'] = $result[$key]['orig_amount'] . ', ' . $orig_amount;
-                $result[$key]['orig_article'] = $result[$key]['orig_article'] . ', ' . $orig_article;
+            if(isset($result[$vendor_hash_key])){
+                $result[$vendor_hash_key]['amount'] = $result[$vendor_hash_key]['amount'] + $amount;
+                $result[$vendor_hash_key]['orig_amount'] = $result[$vendor_hash_key]['orig_amount'] . ', ' . $orig_amount;
+                $result[$vendor_hash_key]['orig_article'] = $result[$vendor_hash_key]['orig_article'] . ', ' . $orig_article;
             } else {
 
-                $result[$key]['vendor'] = $current_vendor;
+                $result[$vendor_hash_key]['vendor'] = $current_vendor;
 
-                $result[$key]['amount'] = $amount;
-                $result[$key]['article'] = $hash;
+                $result[$vendor_hash_key]['amount'] = $amount;
+                $result[$vendor_hash_key]['article'] = $hash;
 
-                $result[$key]['orig_amount'] = $orig_amount;
-                $result[$key]['orig_article'] = $orig_article;
+                $result[$vendor_hash_key]['orig_amount'] = $orig_amount;
+                $result[$vendor_hash_key]['orig_article'] = $orig_article;
 
-                $result[$key]['title'] = implode( ', ', $title );
+                $result[$vendor_hash_key]['title'] = implode( ', ', $title );
+
+                if( isset( $duplicate_hashes[$vendor_hash_key] ) ) {
+                    $hash_duplicate = $duplicate_hashes[$vendor_hash_key];
+                    $product_id = $hash_duplicate['first']['id'];
+                    $duplicate  = var_export( $duplicate_hashes[$vendor_hash_key], true );
+                } else if ( isset( $hashed_products[$vendor_hash_key] ) ) {
+                    $product_id = $hashed_products[$vendor_hash_key]['id'];
+                } else if ( isset( $allArticles[$orig_article] ) ) {
+                    $dictVendor = $allArticles[$orig_article]['vendor'];
+                    if ( ( $dictVendor == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $dictVendor == $this->vendor_synonym[$current_vendor] ) ) ) {
+                        $product_id = $allArticles[$orig_article]['product_id'];
+                    }
+                }
+
+                $result[$vendor_hash_key]['product_id'] = $product_id;
+                $result[$vendor_hash_key]['duplicate'] = $duplicate;
 
                 // $result[$key]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
-                if ( isset( $duplicate_hashes[$hash] ) ) {
-                    $hash_duplicate = $duplicate_hashes[$hash];
+                /*if ( isset( $duplicate_hashes[$vendor_hash_key] ) ) {
+                    $hash_duplicate = $duplicate_hashes[$vendor_hash_key];
                     foreach ( $hash_duplicate as $item ) {
                         $tmp_vend = mb_strtolower( $item['vendor'] );
                         if ( ( $tmp_vend == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $tmp_vend == $this->vendor_synonym[$current_vendor] ) ) ) {
@@ -185,21 +179,21 @@ class Aquademi extends ExcelToCsv
 
                 }
                 if ( $product_id ) {
-                    $result[$key]['product_id'] = $product_id;
-                    $result[$key]['duplicate'] = '';
+                    $result[$vendor_hash_key]['product_id'] = $product_id;
+                    $result[$vendor_hash_key]['duplicate'] = '';
                 } else {
-                    $result[$key]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? var_export( $duplicate_hashes[$hash], true ) : '';
-                    if ( isset( $hashed_products[$hash] ) ) {
-                        $result[$key]['product_id'] = $hashed_products[$hash];
+                    $result[$vendor_hash_key]['duplicate'] = ( isset( $duplicate_hashes[$vendor_hash_key] ) ) ? var_export( $duplicate_hashes[$vendor_hash_key], true ) : '';
+                    if ( isset( $hashed_products[$vendor_hash_key] ) ) {
+                        $result[$vendor_hash_key]['product_id'] = $hashed_products[$vendor_hash_key]['id'];
                     } else if ( isset( $allArticles[$orig_article] ) ) {
                         $dictVendor = $allArticles[$orig_article]['vendor'];
                         if ( ( $dictVendor == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $dictVendor == $this->vendor_synonym[$current_vendor] ) ) ) {
-                            $result[$key]['product_id'] = $allArticles[$orig_article]['product_id'];
+                            $result[$vendor_hash_key]['product_id'] = $allArticles[$orig_article]['product_id'];
                         }
                     } else {
-                        $result[$key]['product_id'] = '';
+                        $result[$vendor_hash_key]['product_id'] = '';
                     };
-                }
+                }*/
             }
 
         }
