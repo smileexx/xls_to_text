@@ -155,42 +155,51 @@ class Aquademi extends ExcelToCsv
                 continue;
             }
 
-            $result[$i]['vendor'] = $current_vendor;
+            $key = $current_vendor.$hash;
 
-            $result[$i]['amount'] = $amount;
-            $result[$i]['article'] = $hash;
-
-            $result[$i]['orig_amount'] = $orig_amount;
-            $result[$i]['orig_article'] = $orig_article;
-
-            $result[$i]['title'] = implode( ', ', $title );
-
-            // $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
-            if( isset( $duplicate_hashes[$hash] ) ){
-                $hash_duplicate = $duplicate_hashes[$hash];
-                foreach ( $hash_duplicate  as $item ) {
-                    $tmp_vend = mb_strtolower($item['vendor']);
-                    if( ($tmp_vend == $current_vendor) || ( isset($this->vendor_synonym[$current_vendor]) && ($tmp_vend == $this->vendor_synonym[$current_vendor]) ) ){
-                        $product_id = $item['id'];
-                    }
-                }
-
-            }
-            if($product_id){
-                $result[$i]['product_id'] = $product_id;
-                $result[$i]['duplicate'] = '';
+            if(isset($result[$key])){
+                $result[$key]['amount'] = $result[$key]['amount'] + $amount;
+                $result[$key]['orig_amount'] = $result[$key]['orig_amount'] . ', ' . $orig_amount;
+                $result[$key]['orig_article'] = $result[$key]['orig_article'] . ', ' . $orig_article;
             } else {
-                $result[$i]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? var_export( $duplicate_hashes[$hash], true) : '';
-                if ( isset( $hashed_products[$hash] ) ){
-                    $result[$i]['product_id'] = $hashed_products[$hash];
-                } else if ( isset($allArticles[$orig_article]) ){
-                    $dictVendor = $allArticles[$orig_article]['vendor'];
-                    if( ($dictVendor == $current_vendor) || ( isset($this->vendor_synonym[$current_vendor]) && ($dictVendor == $this->vendor_synonym[$current_vendor]) ) ){
-                        $result[$i]['product_id'] = $allArticles[$orig_article]['product_id'];
+
+                $result[$key]['vendor'] = $current_vendor;
+
+                $result[$key]['amount'] = $amount;
+                $result[$key]['article'] = $hash;
+
+                $result[$key]['orig_amount'] = $orig_amount;
+                $result[$key]['orig_article'] = $orig_article;
+
+                $result[$key]['title'] = implode( ', ', $title );
+
+                // $result[$key]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
+                if ( isset( $duplicate_hashes[$hash] ) ) {
+                    $hash_duplicate = $duplicate_hashes[$hash];
+                    foreach ( $hash_duplicate as $item ) {
+                        $tmp_vend = mb_strtolower( $item['vendor'] );
+                        if ( ( $tmp_vend == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $tmp_vend == $this->vendor_synonym[$current_vendor] ) ) ) {
+                            $product_id = $item['id'];
+                        }
                     }
+
+                }
+                if ( $product_id ) {
+                    $result[$key]['product_id'] = $product_id;
+                    $result[$key]['duplicate'] = '';
                 } else {
-                    $result[$i]['product_id'] = '';
-                };
+                    $result[$key]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? var_export( $duplicate_hashes[$hash], true ) : '';
+                    if ( isset( $hashed_products[$hash] ) ) {
+                        $result[$key]['product_id'] = $hashed_products[$hash];
+                    } else if ( isset( $allArticles[$orig_article] ) ) {
+                        $dictVendor = $allArticles[$orig_article]['vendor'];
+                        if ( ( $dictVendor == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $dictVendor == $this->vendor_synonym[$current_vendor] ) ) ) {
+                            $result[$key]['product_id'] = $allArticles[$orig_article]['product_id'];
+                        }
+                    } else {
+                        $result[$key]['product_id'] = '';
+                    };
+                }
             }
 
         }
