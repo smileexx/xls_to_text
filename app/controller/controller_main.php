@@ -10,7 +10,7 @@ class ControllerMain extends Controller
 {
     function index()
     {
-        $data['page_header'] = 'Main page';
+        $data['page_header'] = 'Главная страница';
         $this->view->generate('_common.php', 'main_view.php', $data);
     }
 

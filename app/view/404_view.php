@@ -2,5 +2,5 @@
     404 Not Found!
 </H1>
 <div>
-    Something went wrong!
+    Что-то пошло не так 0_о
 </div>

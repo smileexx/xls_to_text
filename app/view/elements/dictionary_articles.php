@@ -4,7 +4,7 @@
         <div class="col-xs-2"><?php echo $val['vendor']; ?></div>
         <div class="col-xs-2"><?php echo $val['product_id']; ?></div>
         <div class="col-xs-2">
-            <button type="button" class="btn btn-danger article-delete" data-id="<?php echo $val['id']; ?>">Delete</button>
+            <button type="button" class="btn btn-danger article-delete" data-id="<?php echo $val['id']; ?>">Удалить</button>
         </div>
     </div>
 <?php } ?>

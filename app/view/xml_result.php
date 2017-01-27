@@ -1,16 +1,19 @@
-<div>
-    <?php echo "<a href=\"{$data['download_link']}\" target=\"_blank\">{$data['download_link']}</a><br /><hr>" ; ?>
+<div class="row">
+    <div class="col-xs-2">Распознано: </div><div class="col-xs-10"><?php echo "<a href=\"{$data['download_link']}\" target=\"_blank\">{$data['download_link']}</a>" ; ?></div>
+</div>
+<div class="row">
+    <div class="col-xs-2">НЕ распознано: </div><div class="col-xs-10"><?php echo "<a href=\"{$data['download_unrecognized']}\" target=\"_blank\">{$data['download_unrecognized']}</a>" ; ?></div>
 </div>
 <div class="result-table">
     <div class="row">
-        <div class="col-xs-2">Hash</div>
-        <div class="col-xs-1">Amount</div>
-        <div class="col-xs-1">ProductID</div>
-        <div class="col-xs-1">Orig. Article</div>
-        <div class="col-xs-1">Orig. Amount</div>
-        <div class="col-xs-1">Vendor</div>
-        <div class="col-xs-4">Orig. Title</div>
-        <div class="col-xs-1">Duplicate ProductID</div>
+        <div class="col-xs-2">Артикул (хеш)</div>
+        <div class="col-xs-1">Количество</div>
+        <div class="col-xs-1">ID продукта</div>
+        <div class="col-xs-1">Артикул ориг.</div>
+        <div class="col-xs-1">Колич. ориг.</div>
+        <div class="col-xs-1">Производитель</div>
+        <div class="col-xs-4">Текст</div>
+        <div class="col-xs-1">Дубликаты</div>
     </div>
     <?php foreach ($data['pricelist']['price'] as $key => $val) { ?>
         <div class="row">
@@ -27,7 +30,7 @@
 </div>
 <hr>
 <div class="skipped-results">
-    <h2>Skipped results</h2>
+    <h2>Пропущеные данные</h2>
 </div>
 <?php
 if( !empty($data['pricelist']['error']) ){

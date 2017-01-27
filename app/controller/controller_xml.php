@@ -60,11 +60,16 @@ class ControllerXml extends Controller
             // You should name it uniquely.
             // DO NOT USE $_FILES[self::$file_param]['name'] WITHOUT ANY VALIDATION !!
             // On this example, obtain safe unique name from its binary data.
-            $new_name = sprintf( UPLOAD_DIR . '%s_%s.%s',
-                sha1_file( $_FILES[self::$file_param]['tmp_name'] ),
+
+            $fname = substr( $_FILES[self::$file_param]['name'], 0, strrpos( $_FILES[self::$file_param]['name'], '.' ) );
+
+            $new_name = sprintf( '%s_%s.%s',
+                $fname,
                 date('Y-m-d_H-i-s', time()),
                 $ext
             );
+            $new_name = UPLOAD_DIR . $this->sanitize_file_name($new_name);
+
             if ( !move_uploaded_file( $_FILES[self::$file_param]['tmp_name'], $new_name ) ) {
                 throw new RuntimeException( 'Failed to move uploaded file.' );
             }
@@ -129,11 +134,12 @@ class ControllerXml extends Controller
         $Converter = new Aquademi();
         $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
-        $download_link = $Converter->generateDownloadLink( $file );
+        $download_unrecognized = $Converter->writeUnrecognizedToCsv( $pricelist['price'], $file );
 
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
-            'download_link' => $download_link
+            'download_link' => '',
+            'download_unrecognized' => $download_unrecognized
         ] );
     }
 
@@ -148,7 +154,8 @@ class ControllerXml extends Controller
 
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
-            'download_link' => $download_link
+            'download_link' => '',
+            'download_unrecognized' => ''
         ] );
     }
 
@@ -159,11 +166,12 @@ class ControllerXml extends Controller
         $Converter = new Bulbashka();
         $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
-        $download_link = $Converter->generateDownloadLink( $file );
+        $download_unrecognized = $Converter->writeUnrecognizedToCsv( $pricelist['price'], $file );
 
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
-            'download_link' => $download_link
+            'download_link' => '',
+            'download_unrecognized' => $download_unrecognized
         ] );
 
     }
@@ -178,9 +186,28 @@ class ControllerXml extends Controller
 
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
-            'download_link' => $download_link
+            'download_link' => '',
+            'download_unrecognized' => ''
         ] );
 
+    }
+
+    private function sanitize_file_name($filename) {
+        $string = mb_convert_case( $filename, MB_CASE_LOWER, "UTF-8" );
+        $string = $this->transliterate($string);
+        $string = str_replace ("ø", "oe", $string);
+        $string = str_replace ("å", "aa", $string);
+        $string = str_replace ("æ", "ae", $string);
+        $string = str_replace (" ", "_", $string);
+        $string = str_replace ("..", ".", $string);
+        $string = preg_replace ("/[^\d\w^_^.^-]/", "", $string);
+        return $string;
+    }
+
+    function transliterate($string) {
+        $roman = array("Sch","sch",'Yo','Zh','Kh','Ts','Ch','Sh','Yu','ya','yo','zh','kh','ts','ch','sh','yu','ya','A','B','V','G','D','E','Z','I','Y','K','L','M','N','O','P','R','S','T','U','F','','Y','','E','a','b','v','g','d','e','z','i','y','k','l','m','n','o','p','r','s','t','u','f','','y','','e');
+        $cyrillic = array("Щ","щ",'Ё','Ж','Х','Ц','Ч','Ш','Ю','я','ё','ж','х','ц','ч','ш','ю','я','А','Б','В','Г','Д','Е','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Ь','Ы','Ъ','Э','а','б','в','г','д','е','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','ь','ы','ъ','э');
+        return str_replace($cyrillic, $roman, $string);
     }
 
 }

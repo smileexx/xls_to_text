@@ -16,11 +16,11 @@
     </div>
     <div class="dictionary-list">
         <div class="row">
-            <div class="col-xs-2">Hash</div>
-            <div class="col-xs-1">Orig. Article</div>
-            <div class="col-xs-1">ProductID</div>
-            <div class="col-xs-4">Orig. Title</div>
-            <div class="col-xs-4">Action</div>
+            <div class="col-xs-2">Артикул (хеш)</div>
+            <div class="col-xs-1">Артикул ориг.</div>
+            <div class="col-xs-1">ID продукта</div>
+            <div class="col-xs-4">Название полное</div>
+            <div class="col-xs-4">Действие</div>
         </div>
         <div class="bad-items-list">
             <?php echo $data['bad_list']; ?>

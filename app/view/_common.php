@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>XML to Text converter</title>
+    <title>Robins. XLS parser</title>
     <link href="/style/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
     <link href="/style/bootstrap/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet">
     <script src="/js/jquery.min.js"></script>
@@ -14,17 +14,17 @@
 <div id="main-wrapper" >
     <div id="main-menu" >
         <div class="menu-logo inline-flex">
-            <h1>XML parser</h1>
+            <h1>Парсер XLS прайсов</h1>
         </div>
         <ul class="main-menu-list inline-flex">
             <li class="main-menu-item">
-                <a href="/">Main</a>
+                <a href="/">Главная</a>
             </li>
             <li class="main-menu-item">
-                <a href="/pub">Public</a>
+                <a href="/dictionary">Словарь</a>
             </li>
             <li class="main-menu-item">
-                <a href="/dictionary">Dictionary</a>
+                <a href="/pub">Файлы</a>
             </li>
         </ul>
     </div>

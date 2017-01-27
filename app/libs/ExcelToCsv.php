@@ -23,7 +23,7 @@ Class ExcelToCsv
 
     private $options = [
         'separator' => ';',
-        'out_folder' => './out',
+        'out_folder' => './pub/download',
         'out_file_type' => '.txt',
     ];
 
@@ -379,6 +379,30 @@ Class ExcelToCsv
         $name = pathinfo( $in_path, PATHINFO_FILENAME );
 
         return DOWNLOAD_URL . $name . $this->options['out_file_type'];
+    }
+
+    function writeUnrecognizedToCsv( $data, $file_input ){
+        $name = pathinfo( $file_input, PATHINFO_FILENAME );
+        $out_folder = $this->options['out_folder'];
+        if ( !file_exists( $out_folder ) ) {
+            mkdir( $out_folder, true );
+        }
+        $full_name = $out_folder . '/' . $name . '.csv';
+
+        $fp = fopen( $full_name , 'w');
+        // File with BOM
+        fwrite( $fp, chr( 239 ) . chr( 187 ) . chr( 191 ) );
+        fputcsv($fp, ["Артикул оригинальный", "Количество", "Производитель", "Текст", "Артикул распознаный" ], ";");
+        foreach ($data as $fields) {
+            if ( !empty( $fields['product_id'] ) ) {
+                continue;
+            }
+
+            fputcsv($fp, [ $fields['orig_article']  , $fields['orig_amount'], $fields['vendor'], $fields['title'], $fields['article']  ], ";");
+        }
+
+        fclose($fp);
+        return $full_name;
     }
 
 

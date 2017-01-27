@@ -13,7 +13,7 @@ class ControllerDictionary extends Controller
     function index()
     {
         $data = [];
-        $data['page_header'] = 'Dictionary';
+        $data['page_header'] = 'Словарь';
         $articles = $this->modelDict->getAllArticles();
         $data['articles'] = $this->view->render('elements/dictionary_articles.php', array('articles' => $articles ));
         $data['vendors'] = $this->modelDict->getAllVendors();

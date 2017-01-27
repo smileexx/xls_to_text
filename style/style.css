@@ -91,6 +91,7 @@ table, th, td {
 }
 .result-table .row>div{
     border-left: 1px solid;
+    word-wrap: break-word;
 }
 
 .result-table .row>div:first-child{
@@ -101,8 +102,8 @@ table, th, td {
     position: fixed;
     bottom: 20px;
     right: 15px;
-    height: 64px;
-    width: 64px;
+    height: 108px;
+    width: 108px;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;

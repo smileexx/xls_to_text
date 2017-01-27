@@ -20,6 +20,11 @@ class Bulbashka extends ExcelToCsv
         // settings
         $sheet_id = 0;
 
+        $lexem_sinonim = [
+            '/BZ/' => '/bronze/',
+            '/BR/' => '/bronze/',
+        ];
+
         $first_row = 2;
         $last_row_default = 0;
 
@@ -30,7 +35,7 @@ class Bulbashka extends ExcelToCsv
             0 => [
                 'input_col' => 0,
                 'type' => 'article',
-                'reg' => '/^\/?(.*?)\//'
+                'reg' => '/^\/?(.*)\//'
             ],
             1 => [
                 'input_col' => 2,
@@ -72,6 +77,10 @@ class Bulbashka extends ExcelToCsv
                 continue;
             }
 
+            if( $current_vendor == 'simas' ){
+                $qq = 0;
+            }
+
             $last_row = ( $last_row_default ) ? $last_row_default : $sheet->getHighestRow();
             // $last_column = ( $last_column ) ? $last_column : $sheet->getHighestColumn();
 
@@ -107,7 +116,11 @@ class Bulbashka extends ExcelToCsv
                         $cell_val = $phpCell->getFormattedValue();
                         if ( $column['type'] == 'article' ) {
                             if ( preg_match( $column['reg'], $cell_val, $matches ) ) {
-                                $orig_article = $cell_val = $matches[1];
+                                $match = $matches[1];
+                                /*foreach ($lexem_sinonim as $lkey=>$lval){
+                                    $match = str_replace($lkey, $lval, $match);
+                                }*/
+                                $orig_article = $cell_val = $match;
                             }
                             $hash = $this->normalizeArticle( $cell_val );
                         } else {
@@ -119,7 +132,23 @@ class Bulbashka extends ExcelToCsv
                     }
                 }
 
-                $vendor_hash_key = $current_vendor.$hash;
+                $vendor_hash_key = $current_vendor . $hash;
+
+                if ( !isset( $hashed_products[$vendor_hash_key] ) ) {
+                    $slash_str = $orig_article;
+                    $tmp_vendor_hash_key = $vendor_hash_key;
+
+                    while ( strrpos( $slash_str, '/' ) > -1 ) {
+                        $slash_str = substr( $slash_str, 0, strrpos( $slash_str, '/' ) );
+                        $tmp_hash = $this->normalizeArticle( $slash_str );
+                        $tmp_vendor_hash_key =  $current_vendor . $tmp_hash;
+                        if( isset( $hashed_products[$tmp_vendor_hash_key] ) ) {
+                            $vendor_hash_key = $tmp_vendor_hash_key;
+                            $hash = $tmp_hash;
+                            break;
+                        }
+                    }
+                }
 
                 if(isset($result[$vendor_hash_key])){
                     $result[$vendor_hash_key]['amount'] = $result[$vendor_hash_key]['amount'] + $amount;
