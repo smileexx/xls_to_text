@@ -150,12 +150,12 @@ class ControllerXml extends Controller
         $Converter = new Ubm();
         $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
-        $download_link = $Converter->generateDownloadLink( $file );
+        $download_unrecognized = $Converter->writeUnrecognizedToCsv( $pricelist['price'], $file );
 
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
             'download_link' => '',
-            'download_unrecognized' => ''
+            'download_unrecognized' => $download_unrecognized
         ] );
     }
 

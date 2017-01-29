@@ -22,7 +22,7 @@
             <div class="col-xs-1"><?php echo $val['product_id']; ?></div>
             <div class="col-xs-1"><?php echo $val['orig_article']; ?></div>
             <div class="col-xs-1"><?php echo $val['orig_amount']; ?></div>
-            <div class="col-xs-1"><?php echo ($val['vendor']) ? $val['vendor'] : '' ; ?></div>
+            <div class="col-xs-1"><?php echo (isset($val['vendor'])) ? $val['vendor'] : '' ; ?></div>
             <div class="col-xs-4"><?php echo $val['title']; ?></div>
             <div class="col-xs-1"><?php echo $val['duplicate']; ?></div>
         </div>
