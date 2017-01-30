@@ -17,8 +17,8 @@
                 <option value="antei">Антей</option>
                 <option value="bulbashka">Бульбашка</option>
                 <option value="ubm">УБМ</option>
+                <option value="germes">Гермес</option>
                 <!-- <option value="armoni">Армони</option>
-                 <option value="germes">Гермес</option>
                  <option value="marko">Марко треви</option>
                  <option value="metaplan">Метаплан(оптгрупп)</option> -->
              </select>

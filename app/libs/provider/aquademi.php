@@ -108,7 +108,7 @@ class Aquademi extends ExcelToCsv
                         }
                         break;
                     case 'vendor':
-                        $tmp_vendor = mb_strtolower($formated_value, 'UTF-8');
+                        $tmp_vendor = trim(mb_strtolower($formated_value, 'UTF-8'));
                         if( in_array($tmp_vendor, $this->vendors) ) {
                             $current_vendor = $tmp_vendor;
                         }

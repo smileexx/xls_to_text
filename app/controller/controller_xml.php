@@ -110,8 +110,10 @@ class ControllerXml extends Controller
                 case 'antei':
                     $this->parse_antei( $new_name, $new_products, $duplicate );
                     break;
-                case 'armoni':
                 case 'germes':
+                    $this->parse_germes( $new_name, $new_products, $duplicate );
+                    break;
+                case 'armoni':
                 case 'marko':
                 case 'metaplan':
                     break;
@@ -175,6 +177,7 @@ class ControllerXml extends Controller
         ] );
 
     }
+
     private function parse_antei( $file, $hash_products, $duplicate  )
     {
         require_once (dirname( __FILE__ ) . '/../libs/provider/antei.php');
@@ -182,12 +185,33 @@ class ControllerXml extends Controller
         $Converter = new Antei();
         $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
-        $download_link = $Converter->generateDownloadLink( $file );
+        // $download_link = $Converter->generateDownloadLink( $file );
+
+        $download_unrecognized = $Converter->writeUnrecognizedToCsv( $pricelist['price'], $file );
 
         $this->view->generate( '_common.php', 'xml_result.php', [
             'pricelist' => $pricelist,
             'download_link' => '',
-            'download_unrecognized' => ''
+            'download_unrecognized' => $download_unrecognized
+        ] );
+
+    }
+
+    private function parse_germes( $file, $hash_products, $duplicate  )
+    {
+        require_once (dirname( __FILE__ ) . '/../libs/provider/germes.php');
+
+        $Converter = new Germes();
+        $pricelist = $Converter->process($file, $hash_products, $duplicate);
+
+        // $download_link = $Converter->generateDownloadLink( $file );
+
+        $download_unrecognized = $Converter->writeUnrecognizedToCsv( $pricelist['price'], $file );
+
+        $this->view->generate( '_common.php', 'xml_result.php', [
+            'pricelist' => $pricelist,
+            'download_link' => '',
+            'download_unrecognized' => $download_unrecognized
         ] );
 
     }

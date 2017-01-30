@@ -2,21 +2,19 @@
 
 require_once( dirname( __FILE__ ) . '/../ExcelToCsv.php' );
 
-class Ubm extends ExcelToCsv
+class Germes extends ExcelToCsv
 {
 
     private $vendors = [];
 
-    private $vendor_synonym = [
-        'grohe ag' => 'grohe',
-    ];
+    private $vendor_synonym = [];
 
     function process( $file, $hashed_products, $duplicate_hashes )
     {
         // settings
         $sheet_id = 0;
 
-        $first_row = 16;
+        $first_row = 10;
         $last_row = 0;
 
 //        $first_column = 1;
@@ -24,30 +22,34 @@ class Ubm extends ExcelToCsv
 
         $columns = [
             0 => [
-                'input_col' => 6,
+                'input_col' => 5,
                 'type' => 'article'
             ],
             1 => [
-                'input_col' => 9,
+                'input_col' => 6,
                 'type' => 'amount',
                 'literal' => true
             ],
             2 => [
-                'input_col' => 7,
+                'input_col' => 3,
                 'type' => 'vendor',
             ],
             3 => [
-                'input_col' => 0,
+                'input_col' => 2,
                 'type' => 'title',
             ],
             4 => [
-                'input_col' => 5,
+                'input_col' => 1,
                 'prefix'    => 'Код: ',
                 'type' => 'title',
             ],
             5 => [
-                'input_col' => 8,
+                'input_col' => 7,
                 'prefix'    => 'Цена: ',
+                'type' => 'title',
+            ],
+            6 => [
+                'input_col' => 8,
                 'type' => 'title',
             ]
         ];

@@ -70,7 +70,7 @@ class Bulbashka extends ExcelToCsv
             // $sheet_id = $sheet_key;
             // $sheet = $objPhpExcel->getSheet( $sheet_id );
 
-            $tmp_vendor = mb_strtolower($sheet->getTitle(), 'UTF-8');
+            $tmp_vendor = trim( mb_strtolower($sheet->getTitle(), 'UTF-8') );
             if( in_array($tmp_vendor, $this->vendors) ) {
                 $current_vendor = $tmp_vendor;
             } else {

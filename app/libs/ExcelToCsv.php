@@ -14,6 +14,7 @@ Class ExcelToCsv
 
     public $amount_format = [
         'вналичии' => 50,
+        'доступно' => 10,
         'заканчивается' => 1,
         'да' => 10,
         'нет' => 0,
@@ -398,7 +399,13 @@ Class ExcelToCsv
                 continue;
             }
 
-            fputcsv($fp, [ $fields['orig_article']  , $fields['orig_amount'], $fields['vendor'], $fields['title'], $fields['article']  ], ";");
+            $orig_article = ( isset($fields['orig_article'] ) ) ? $fields['orig_article'] : '';
+            $orig_amount = ( isset($fields['orig_amount'] ) ) ? $fields['orig_amount'] : '';
+            $vendor = ( isset($fields['vendor'] ) ) ? $fields['vendor'] : '';
+            $title = ( isset($fields['title'] ) ) ? $fields['title'] : '';
+            $article = ( isset($fields['article'] ) ) ? $fields['article'] : '';
+
+                fputcsv($fp, [ $orig_article, $orig_amount, $vendor, $title, $article ], ";");
         }
 
         fclose($fp);
