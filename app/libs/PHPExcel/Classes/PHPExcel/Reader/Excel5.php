@@ -616,7 +616,7 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
      * @return     PHPExcel
      * @throws     PHPExcel_Reader_Exception
      */
-    public function load($pFilename)
+    public function load($pFilename, $codepage = 'CP1252' )
     {
         // Read the OLE file
         $this->loadOLE($pFilename);
@@ -640,7 +640,7 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
 
         // initialize
         $this->pos                 = 0;
-        $this->codepage            = 'CP1252';
+        $this->codepage            = $codepage;
         $this->formats             = array();
         $this->objFonts            = array();
         $this->palette             = array();

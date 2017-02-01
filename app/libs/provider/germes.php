@@ -65,7 +65,7 @@ class Germes extends ExcelToCsv
         }
         $allArticles = $modelXml->getAllArticles();
 
-        $objPhpExcel = $this->getPhpExcel( $file );
+        $objPhpExcel = $this->getPhpExcel( $file, 'CP1251' );
         // $allSheets = $objPhpExcel->getAllSheets();
         $sheet = $objPhpExcel->getSheet( $sheet_id );
         $last_row = ( $last_row ) ? $last_row : $sheet->getHighestRow();
@@ -97,8 +97,9 @@ class Germes extends ExcelToCsv
 
                 switch($column['type']){
                     case 'amount':
-                        $amount = $phpCell->getValue();
-                        $orig_amount = $phpCell->getFormattedValue();
+                        $amount = $value;
+                        $orig_amount = $this->decodeCyrillic( $phpCell->getFormattedValue() );
+
                         $amount = mb_convert_case( preg_replace( "/\s/iu", "", $amount ), MB_CASE_LOWER, "UTF-8" );
                         if ( isset( $this->amount_format[$amount] ) ) {
                             $amount = $this->amount_format[$amount];
@@ -120,7 +121,7 @@ class Germes extends ExcelToCsv
                         if(isset($column['prefix'])){
                             $formated_value = $column['prefix'] . $formated_value;
                         }
-                        $title[] = $formated_value;
+                        $title[] = $this->decodeCyrillic( $formated_value );
                         break;
                 }
             }
@@ -172,6 +173,12 @@ class Germes extends ExcelToCsv
         }
 
         return [ 'price' => $result, 'error' => $result_skip ];
+    }
+
+    private function decodeCyrillic($str ){
+//        return ( mb_detect_encoding($str) == 'UTF-8' )?
+//            mb_convert_encoding($str, 'UTF-8', 'UTF-16LE') : $str;
+        return $str;
     }
 
 }

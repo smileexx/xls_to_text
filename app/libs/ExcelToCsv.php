@@ -133,13 +133,13 @@ Class ExcelToCsv
         }
     }
 
-    function getPhpExcel( $file_path ){
+    function getPhpExcel( $file_path, $codepage = 'CP1252' ){
         if ( !file_exists( $file_path ) ) {
             $this->pr( "ERROR. File '$file_path' not found!" );
             return false;
         }
         try{
-            $this->phpExcel = PHPExcel_IOFactory::load( $file_path );
+            $this->phpExcel = PHPExcel_IOFactory::load( $file_path, $codepage );
             return $this->phpExcel;
         } catch (Exception $err){
             $this->pr( "ERROR. Can't read file." );

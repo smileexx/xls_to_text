@@ -42,5 +42,5 @@ interface PHPExcel_Reader_IReader
      * @return  PHPExcel
      * @throws     PHPExcel_Reader_Exception
      */
-    public function load($pFilename);
+    public function load($pFilename, $codepage);
 }

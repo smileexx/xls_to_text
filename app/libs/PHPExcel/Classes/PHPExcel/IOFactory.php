@@ -186,10 +186,10 @@ class PHPExcel_IOFactory
      * @return    PHPExcel
      * @throws    PHPExcel_Reader_Exception
      */
-    public static function load($pFilename)
+    public static function load($pFilename, $codepage = 'CP1252')
     {
         $reader = self::createReaderForFile($pFilename);
-        return $reader->load($pFilename);
+        return $reader->load($pFilename, $codepage);
     }
 
     /**
