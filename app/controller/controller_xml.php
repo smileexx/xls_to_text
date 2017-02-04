@@ -113,6 +113,12 @@ class ControllerXml extends Controller
                 case 'germes':
                     $this->parse_germes( $new_name, $new_products, $duplicate );
                     break;
+                case 'mtg':
+                    $this->parse_mtg( $new_name, $new_products, $duplicate );
+                    break;
+                case 'optgroup':
+                    $this->parse_optgroup( $new_name, $new_products, $duplicate );
+                    break;
                 case 'armoni':
                 case 'marko':
                 case 'metaplan':
@@ -202,6 +208,42 @@ class ControllerXml extends Controller
         require_once (dirname( __FILE__ ) . '/../libs/provider/germes.php');
 
         $Converter = new Germes();
+        $pricelist = $Converter->process($file, $hash_products, $duplicate);
+
+        // $download_link = $Converter->generateDownloadLink( $file );
+
+        $download_unrecognized = $Converter->writeUnrecognizedToCsv( $pricelist['price'], $file );
+
+        $this->view->generate( '_common.php', 'xml_result.php', [
+            'pricelist' => $pricelist,
+            'download_link' => '',
+            'download_unrecognized' => $download_unrecognized
+        ] );
+
+    }
+    private function parse_mtg( $file, $hash_products, $duplicate  )
+    {
+        require_once (dirname( __FILE__ ) . '/../libs/provider/mtg.php');
+
+        $Converter = new Mtg();
+        $pricelist = $Converter->process($file, $hash_products, $duplicate);
+
+        // $download_link = $Converter->generateDownloadLink( $file );
+
+        $download_unrecognized = $Converter->writeUnrecognizedToCsv( $pricelist['price'], $file );
+
+        $this->view->generate( '_common.php', 'xml_result.php', [
+            'pricelist' => $pricelist,
+            'download_link' => '',
+            'download_unrecognized' => $download_unrecognized
+        ] );
+
+    }
+    private function parse_optgroup( $file, $hash_products, $duplicate  )
+    {
+        require_once (dirname( __FILE__ ) . '/../libs/provider/optgroup.php');
+
+        $Converter = new OptGroup();
         $pricelist = $Converter->process($file, $hash_products, $duplicate);
 
         // $download_link = $Converter->generateDownloadLink( $file );

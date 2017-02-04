@@ -18,6 +18,8 @@
                 <option value="bulbashka">Бульбашка</option>
                 <option value="ubm">УБМ</option>
                 <option value="germes">Гермес</option>
+                <option value="mtg">МТГ</option>
+                <option value="optgroup">Опт Груп</option>
                 <!-- <option value="armoni">Армони</option>
                  <option value="marko">Марко треви</option>
                  <option value="metaplan">Метаплан(оптгрупп)</option> -->
