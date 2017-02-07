@@ -382,7 +382,7 @@ Class ExcelToCsv
         return DOWNLOAD_URL . $name . $this->options['out_file_type'];
     }
 
-    function writeUnrecognizedToCsv( $data, $file_input ){
+    function writeUnrecognizedToCsv($data, $file_input, $delimiter = ";" ){
         $name = pathinfo( $file_input, PATHINFO_FILENAME );
         $out_folder = $this->options['out_folder'];
         if ( !file_exists( $out_folder ) ) {
@@ -393,19 +393,19 @@ Class ExcelToCsv
         $fp = fopen( $full_name , 'w');
         // File with BOM
         fwrite( $fp, chr( 239 ) . chr( 187 ) . chr( 191 ) );
-        fputcsv($fp, ["Артикул оригинальный", "Количество", "Производитель", "Текст", "Артикул распознаный" ], ";");
+        fputcsv($fp, ["Артикул оригинальный", "Количество", "Производитель", "Текст", "Артикул распознаный" ], $delimiter);
         foreach ($data as $fields) {
             if ( !empty( $fields['product_id'] ) ) {
                 continue;
             }
 
-            $orig_article = ( isset($fields['orig_article'] ) ) ? $fields['orig_article'] : '';
-            $orig_amount = ( isset($fields['orig_amount'] ) ) ? $fields['orig_amount'] : '';
-            $vendor = ( isset($fields['vendor'] ) ) ? $fields['vendor'] : '';
-            $title = ( isset($fields['title'] ) ) ? $fields['title'] : '';
-            $article = ( isset($fields['article'] ) ) ? $fields['article'] : '';
+            $orig_article = ( isset($fields['orig_article'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['orig_article'] )  : "";
+            $orig_amount = ( isset($fields['orig_amount'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['orig_article'] ) : "";
+            $vendor = ( isset($fields['vendor'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['vendor'] ) : "";
+            $title = ( isset($fields['title'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['title'] ) : "";
+            $article = ( isset($fields['article'] ) ) ? $fields['article'] : "";
 
-                fputcsv($fp, [ $orig_article, $orig_amount, $vendor, $title, $article ], ";");
+                fputcsv($fp, [ $orig_article, $orig_amount, $vendor, $title, $article ], $delimiter);
         }
 
         fclose($fp);

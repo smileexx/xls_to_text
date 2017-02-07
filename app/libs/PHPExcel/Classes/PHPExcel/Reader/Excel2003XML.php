@@ -220,7 +220,7 @@ class PHPExcel_Reader_Excel2003XML extends PHPExcel_Reader_Abstract implements P
      * @return     PHPExcel
      * @throws     PHPExcel_Reader_Exception
      */
-    public function load($pFilename)
+    public function load($pFilename, $codepage = 'CP1252')
     {
         // Create new PHPExcel
         $objPHPExcel = new PHPExcel();

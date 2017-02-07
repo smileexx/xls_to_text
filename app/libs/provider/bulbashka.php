@@ -7,14 +7,6 @@ class Bulbashka extends ExcelToCsv
 
     private $vendors = [];
 
-    private $vendor_synonym = [
-        'axor' => 'hansgrohe',
-        'hansgrohe' => 'axor',
-        'grohe diy' => 'grohe',
-        'grohe spa' => 'grohe',
-        'instal-projekt' => 'install projekt'
-    ];
-
     function process( $file, $hashed_products, $duplicate_hashes )
     {
         // settings
@@ -69,16 +61,14 @@ class Bulbashka extends ExcelToCsv
         foreach ( $allSheets as $sheet_key => $sheet ) {
             // $sheet_id = $sheet_key;
             // $sheet = $objPhpExcel->getSheet( $sheet_id );
+            $current_vendor = null;
 
             $tmp_vendor = trim( mb_strtolower($sheet->getTitle(), 'UTF-8') );
+
             if( in_array($tmp_vendor, $this->vendors) ) {
                 $current_vendor = $tmp_vendor;
-            } else {
-                continue;
-            }
-
-            if( $current_vendor == 'simas' ){
-                $qq = 0;
+            } else if ( isset( $this->vendor_synonym[$tmp_vendor] ) ){
+                $current_vendor = $this->vendor_synonym[$tmp_vendor];
             }
 
             $last_row = ( $last_row_default ) ? $last_row_default : $sheet->getHighestRow();
@@ -132,6 +122,26 @@ class Bulbashka extends ExcelToCsv
                     }
                 }
 
+                $skip = false;
+                if( !$current_vendor || !in_array($current_vendor, $this->vendors) ){
+                    $result_skip[] = sprintf("[Vendor] %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $tmp_vendor, $orig_article, $hash, implode( ', ', $title ) );
+                    $skip = true;
+                }
+                if( empty($hash) || $hash === 'null' ){
+                    $result_skip[] = sprintf("[Hash] Vendor: %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $current_vendor, $orig_article, $hash, implode( ', ', $title ) );
+                    $skip = true;
+                }
+
+                if($skip){
+                    $vendor_hash_key = $tmp_vendor.$hash;
+                    $result[$vendor_hash_key]['orig_amount'] = $orig_amount;
+                    $result[$vendor_hash_key]['orig_article'] = $orig_article;
+                    $result[$vendor_hash_key]['vendor'] = $tmp_vendor;
+                    $result[$vendor_hash_key]['article'] = $hash;
+                    $result[$vendor_hash_key]['title'] = implode( ', ', $title );
+                    continue;
+                }
+
                 $vendor_hash_key = $current_vendor . $hash;
 
                 if ( !isset( $hashed_products[$vendor_hash_key] ) ) {
@@ -183,7 +193,7 @@ class Bulbashka extends ExcelToCsv
                 }
             }
         }
-        return [ 'price' => $result ];
+        return [ 'price' => $result, 'error' => $result_skip ];
     }
 
 }

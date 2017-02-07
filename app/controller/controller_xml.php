@@ -63,9 +63,9 @@ class ControllerXml extends Controller
 
             $fname = substr( $_FILES[self::$file_param]['name'], 0, strrpos( $_FILES[self::$file_param]['name'], '.' ) );
 
-            $new_name = sprintf( '%s_%s.%s',
+            $new_name = sprintf( '%s.%s',
                 $fname,
-                date('Y-m-d_H-i-s', time()),
+                // date('Y-m-d_H-i-s', time()),
                 $ext
             );
             $new_name = UPLOAD_DIR . $this->sanitize_file_name($new_name);

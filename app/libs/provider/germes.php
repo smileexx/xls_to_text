@@ -126,12 +126,23 @@ class Germes extends ExcelToCsv
                 }
             }
 
+            $skip = false;
             if( !$current_vendor || !in_array($current_vendor, $this->vendors) ){
                 $result_skip[] = sprintf("[Vendor] %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $tmp_vendor, $orig_article, $hash, implode( ', ', $title ) );
-                continue;
+                $skip = true;
             }
             if( empty($hash) || $hash === 'null' ){
-                $result_skip[] = sprintf("[Hash]\t%s\t%s\t%s<br>".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
+                $result_skip[] = sprintf("[Hash] Vendor: %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $current_vendor, $orig_article, $hash, implode( ', ', $title ) );
+                $skip = true;
+            }
+
+            if($skip){
+                $vendor_hash_key = $tmp_vendor.$hash;
+                $result[$vendor_hash_key]['orig_amount'] = $orig_amount;
+                $result[$vendor_hash_key]['orig_article'] = $orig_article;
+                $result[$vendor_hash_key]['vendor'] = $tmp_vendor;
+                $result[$vendor_hash_key]['article'] = $hash;
+                $result[$vendor_hash_key]['title'] = implode( ', ', $title );
                 continue;
             }
 

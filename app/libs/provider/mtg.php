@@ -93,9 +93,14 @@ class Mtg extends ExcelToCsv
                         $hash = $this->normalizeArticle( $formated_value );
                         break;
                     case 'vendor':
-                        $tmp_vendor = trim(mb_strtolower($formated_value, 'UTF-8'));
+                        $tmp_vendor = trim( mb_strtolower($formated_value, 'UTF-8') );
+                        if($tmp_vendor == 'duka'){
+                            $aa =0;
+                        }
                         if( in_array($tmp_vendor, $this->vendors) ) {
                             $current_vendor = $tmp_vendor;
+                        } else if ( isset( $this->vendor_synonym[$tmp_vendor] ) ){
+                            $current_vendor = $this->vendor_synonym[$tmp_vendor];
                         }
                         break;
                     default:
@@ -109,12 +114,23 @@ class Mtg extends ExcelToCsv
 //                $result_skip[] = sprintf("[Block]\t%s\t%s\t%s\t%s<br>".PHP_EOL, $current_block_type, $orig_article, $hash, implode( ', ', $title )) ;
 //                continue;
 //            }
+            $skip = false;
             if( !$current_vendor || !in_array($current_vendor, $this->vendors) ){
-                $result_skip[] = sprintf("[Vendor]\t%s\t%s\t%s<br>".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
-                continue;
+                $result_skip[] = sprintf("[Vendor] %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $tmp_vendor, $orig_article, $hash, implode( ', ', $title ) );
+                $skip = true;
             }
-            if( empty($hash) || $hash === 'null' || empty($article_not_formated) ){
-                $result_skip[] = sprintf("[Hash]\t%s\t%s\t%s<br>".PHP_EOL, $orig_article, $hash, implode( ', ', $title ) );
+            if( empty($hash) || $hash === 'null' ){
+                $result_skip[] = sprintf("[Hash] Vendor: %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $current_vendor, $orig_article, $hash, implode( ', ', $title ) );
+                $skip = true;
+            }
+
+            if($skip){
+                $vendor_hash_key = $tmp_vendor.$hash;
+                $result[$vendor_hash_key]['orig_amount'] = $orig_amount;
+                $result[$vendor_hash_key]['orig_article'] = $orig_article;
+                $result[$vendor_hash_key]['vendor'] = $tmp_vendor;
+                $result[$vendor_hash_key]['article'] = $hash;
+                $result[$vendor_hash_key]['title'] = implode( ', ', $title );
                 continue;
             }
 

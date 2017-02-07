@@ -331,7 +331,7 @@ class PHPExcel_Reader_Excel2007 extends PHPExcel_Reader_Abstract implements PHPE
      * @return  PHPExcel
      * @throws     PHPExcel_Reader_Exception
      */
-    public function load($pFilename)
+    public function load($pFilename, $codepage = 'CP1252')
     {
         // Check if file exists
         if (!file_exists($pFilename)) {
