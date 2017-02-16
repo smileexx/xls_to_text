@@ -393,19 +393,20 @@ Class ExcelToCsv
         $fp = fopen( $full_name , 'w');
         // File with BOM
         fwrite( $fp, chr( 239 ) . chr( 187 ) . chr( 191 ) );
-        fputcsv($fp, ["Артикул оригинальный", "Количество", "Производитель", "Текст", "Артикул распознаный" ], $delimiter);
+        fputcsv($fp, ["Артикул оригинальный", "Количество",  "Количество 2", "Производитель", "Текст", "Артикул распознаный" ], $delimiter);
         foreach ($data as $fields) {
             if ( !empty( $fields['product_id'] ) ) {
                 continue;
             }
 
             $orig_article = ( isset($fields['orig_article'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['orig_article'] )  : "";
-            $orig_amount = ( isset($fields['orig_amount'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['orig_article'] ) : "";
+            $orig_amount = ( isset($fields['orig_amount'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['orig_amount'] ) : "";
+            $orig_reserv = ( isset($fields['orig_reserv'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['orig_reserv'] ) : "";
             $vendor = ( isset($fields['vendor'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['vendor'] ) : "";
             $title = ( isset($fields['title'] ) ) ? preg_replace( "/[;,]/iu", " ", $fields['title'] ) : "";
             $article = ( isset($fields['article'] ) ) ? $fields['article'] : "";
 
-                fputcsv($fp, [ $orig_article, $orig_amount, $vendor, $title, $article ], $delimiter);
+                fputcsv($fp, [ $orig_article, $orig_amount, $orig_reserv, $vendor, $title, $article ], $delimiter);
         }
 
         fclose($fp);

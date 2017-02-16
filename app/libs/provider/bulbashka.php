@@ -163,6 +163,7 @@ class Bulbashka extends ExcelToCsv
                 if(isset($result[$vendor_hash_key])){
                     $result[$vendor_hash_key]['amount'] = $result[$vendor_hash_key]['amount'] + $amount;
                     $result[$vendor_hash_key]['orig_amount'] = $result[$vendor_hash_key]['orig_amount'] . ', ' . $orig_amount;
+                    $result[$vendor_hash_key]['orig_reserv'] = $result[$vendor_hash_key]['orig_reserv'] . ', ' . $orig_reserv;
                     $result[$vendor_hash_key]['orig_article'] = $result[$vendor_hash_key]['orig_article'] . ', ' . $orig_article;
                 } else {
                     $result[$vendor_hash_key]['vendor'] = $current_vendor;
@@ -170,7 +171,8 @@ class Bulbashka extends ExcelToCsv
                     $result[$vendor_hash_key]['amount'] = $amount - $reserv;
                     $result[$vendor_hash_key]['article'] = $hash;
 
-                    $result[$vendor_hash_key]['orig_amount'] = $orig_amount . '-' . $orig_reserv;
+                    $result[$vendor_hash_key]['orig_amount'] = $orig_amount;
+                    $result[$vendor_hash_key]['orig_reserv'] = $orig_reserv;
                     $result[$vendor_hash_key]['orig_article'] = $orig_article;
 
                     $result[$vendor_hash_key]['title'] = implode( ', ', $title );

@@ -25,7 +25,7 @@ class Antei extends ExcelToCsv
                 'type' => 'article'
             ],
             1 => [
-                'input_col' => 10,
+                'input_col' => 9,
                 'type' => 'amount'
             ],
             2 => [
@@ -39,6 +39,10 @@ class Antei extends ExcelToCsv
             4 => [
                 'input_col' => 3,
                 'type' => 'title',
+            ],
+            6 => [
+                'input_col' => 10,
+                'type' => 'reserv'
             ]
         ];
 
@@ -66,6 +70,7 @@ class Antei extends ExcelToCsv
 
         for ( $i = $first_row; $i <= $last_row; $i++ ) {
             $amount = 0;
+            $reserv = 0;
             $hash = '';
             $current_vendor = null;
             $product_id = null;
@@ -73,6 +78,7 @@ class Antei extends ExcelToCsv
             $tmp_vendor = null;
 
             $orig_amount = '';
+            $orig_reserv = '';
             $orig_article = '';
 
             $title = [];
@@ -95,6 +101,14 @@ class Antei extends ExcelToCsv
                     case 'article':
                         $orig_article = $formated_value;
                         $hash = $this->normalizeArticle( $formated_value );
+                        break;
+                    case 'reserv':
+                        $reserv = $phpCell->getValue();
+                        $orig_reserv = $phpCell->getFormattedValue();
+                        $reserv = mb_convert_case( preg_replace( "/\s/iu", "", $reserv ), MB_CASE_LOWER, "UTF-8" );
+                        if ( isset( $this->amount_format[$reserv] ) ) {
+                            $reserv = $this->amount_format[$reserv];
+                        }
                         break;
                     case 'vendor':
                         $tmp_vendor = trim( mb_strtolower($formated_value, 'UTF-8') );
@@ -137,15 +151,16 @@ class Antei extends ExcelToCsv
             if(isset($result[$vendor_hash_key])){
                 $result[$vendor_hash_key]['amount'] = $result[$vendor_hash_key]['amount'] + $amount;
                 $result[$vendor_hash_key]['orig_amount'] = $result[$vendor_hash_key]['orig_amount'] . ', ' . $orig_amount;
+                $result[$vendor_hash_key]['orig_reserv'] = $result[$vendor_hash_key]['orig_reserv'] . ', ' . $orig_reserv;
                 $result[$vendor_hash_key]['orig_article'] = $result[$vendor_hash_key]['orig_article'] . ', ' . $orig_article;
             } else {
 
                 $result[$vendor_hash_key]['vendor'] = $current_vendor;
-
-                $result[$vendor_hash_key]['amount'] = $amount;
+                $result[$vendor_hash_key]['amount'] = $amount + $reserv;
                 $result[$vendor_hash_key]['article'] = $hash;
 
                 $result[$vendor_hash_key]['orig_amount'] = $orig_amount;
+                $result[$vendor_hash_key]['orig_reserv'] = $orig_reserv;
                 $result[$vendor_hash_key]['orig_article'] = $orig_article;
 
                 $result[$vendor_hash_key]['title'] = implode( ', ', $title );

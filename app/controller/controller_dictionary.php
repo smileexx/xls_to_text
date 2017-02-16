@@ -14,10 +14,13 @@ class ControllerDictionary extends Controller
     {
         $data = [];
         $data['page_header'] = 'Словарь';
-        $articles = $this->modelDict->getAllArticles();
-        $data['articles'] = $this->view->render('elements/dictionary_articles.php', array('articles' => $articles ));
-        $data['vendors'] = $this->modelDict->getAllVendors();
-        $this->view->generate('_common.php', 'dictionary_articles_view.php', $data);
+        $data['articles'] = $this->modelDict->getAllArticles();
+        $data['vendors'] = $this->modelDict->getAllVendors( 'title' );
+        $data['tab_articles'] = $this->view->render('elements/dictionary/articles.php', $data);
+        $data['tab_vendors'] = $this->view->render('elements/dictionary/vendors.php', $data);
+
+        $this->view->generate('_common.php', 'dictionary_tabs.php', $data);
+        unset($vendors);
     }
 
     public function add_article(){
@@ -32,6 +35,21 @@ class ControllerDictionary extends Controller
 
     public function delete_article(){
         $res = $this->modelDict->deleteArticle($_POST['id']);
+        $this->outputJson( ['success' => true] );
+    }
+
+    public function add_vendor(){
+        $form = $_POST;
+        $res = $this->modelDict->createVendor( $form['title'], $form['code']);
+        if($res){
+            $this->outputJson( ['success' => true] );
+        } else {
+            $this->outputJson( ['success' => false] );
+        }
+    }
+
+    public function delete_vendor(){
+        $res = $this->modelDict->deleteVendor($_POST['id']);
         $this->outputJson( ['success' => true] );
     }
 
