@@ -1,6 +1,6 @@
 <div>
     <div class="dictionary-list">
-        <div class="row">
+        <div class="row header-row">
             <div class="col-xs-5">Значение из прайса (артикул)</div>
             <div class="col-xs-2">Производитель</div>
             <div class="col-xs-2">ID продукта</div>
@@ -41,7 +41,7 @@
                         <label for="new-vendor">Производитель</label>
                         <select class="form-control" id="new-vendor" name="vendor">
                             <?php foreach ($data['vendors'] as $vendor) { ?>
-                                <option value="<?php echo $vendor['code']; ?>"><?php echo $vendor['title']; ?></option>
+                                <option value="<?php echo $vendor['code_price']; ?>"><?php echo sprintf("%s ( %s, %s )", $vendor['title'], $vendor['code_price'], $vendor['code_robins'] ); ?></option>
                             <?php } ?>
                         </select>
                     </div>

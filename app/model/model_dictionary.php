@@ -46,9 +46,9 @@ class Model_Dictionary extends Model
             echo "Record $id deleted successfully\n";
         }*/
     }
-    function createVendor( $title, $code )
+    function createVendor( $title, $code_price, $code_robins )
     {
-        $ret = $this->exec( "INSERT INTO vendors(title, code) VALUES ('$title', '$code');" );
+        $ret = $this->exec( "INSERT INTO vendors(title, code_price, code_robins) VALUES ('$title', '$code_price', '$code_robins');" );
         return $ret;
         /*
         if(!$ret){

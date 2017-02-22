@@ -15,7 +15,7 @@ class ControllerDictionary extends Controller
         $data = [];
         $data['page_header'] = 'Словарь';
         $data['articles'] = $this->modelDict->getAllArticles();
-        $data['vendors'] = $this->modelDict->getAllVendors( 'title' );
+        $data['vendors'] = $this->modelDict->getAllVendors( 'code_price' );
         $data['tab_articles'] = $this->view->render('elements/dictionary/articles.php', $data);
         $data['tab_vendors'] = $this->view->render('elements/dictionary/vendors.php', $data);
 
@@ -40,7 +40,7 @@ class ControllerDictionary extends Controller
 
     public function add_vendor(){
         $form = $_POST;
-        $res = $this->modelDict->createVendor( $form['title'], $form['code']);
+        $res = $this->modelDict->createVendor( $form['title'], $form['code_price'], $form['code_robins']);
         if($res){
             $this->outputJson( ['success' => true] );
         } else {

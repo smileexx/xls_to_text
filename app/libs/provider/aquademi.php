@@ -56,7 +56,7 @@ class Aquademi extends ExcelToCsv
         $modelXml = new Model_Xml();
         $tmpArrVendors = $modelXml->getAllVendors();
         foreach ($tmpArrVendors as $val){
-            $this->vendors[] = $val['code'];
+            $this->vendors[$val['code_price']] = $val['code_robins'];
         }
         $allArticles = $modelXml->getAllArticles();
 
@@ -82,6 +82,7 @@ class Aquademi extends ExcelToCsv
 
             $orig_amount = '';
             $orig_article = '';
+            $tmp_vendor = '';
             $article_not_formated = null;
 
             $title = [];
@@ -109,8 +110,8 @@ class Aquademi extends ExcelToCsv
                         break;
                     case 'vendor':
                         $tmp_vendor = trim(mb_strtolower($formated_value, 'UTF-8'));
-                        if( in_array($tmp_vendor, $this->vendors) ) {
-                            $current_vendor = $tmp_vendor;
+                        if( isset( $this->vendors[$tmp_vendor] ) ) {
+                            $current_vendor = $this->vendors[$tmp_vendor];
                         }
                         break;
                     default:
@@ -120,16 +121,20 @@ class Aquademi extends ExcelToCsv
 
             }
 
-            if( !$current_block_type || !in_array($current_block_type, $this->blocks) || in_array($current_block_type, $this->skip_blocks) ){
+            if($current_vendor == 'huppe'){
+                $qwer = 0;
+            }
+
+            if( !$current_block_type || !in_array($current_block_type, $this->blocks) || in_array($current_block_type, $this->skip_blocks) ) {
                 $result_skip[] = sprintf("[Block]\t%s\t%s\t%s\t%s<br>".PHP_EOL, $current_block_type, $orig_article, $hash, implode( ', ', $title )) ;
                 continue;
             }
             $skip = false;
-            if( !$current_vendor || !in_array($current_vendor, $this->vendors) ){
+            if( !$current_vendor ) {
                 $result_skip[] = sprintf("[Vendor] %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $tmp_vendor, $orig_article, $hash, implode( ', ', $title ) );
                 $skip = true;
             }
-            if( empty($hash) || $hash === 'null' ){
+            if( empty($hash) || $hash === 'null' ) {
                 $result_skip[] = sprintf("[Hash] Vendor: %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $current_vendor, $orig_article, $hash, implode( ', ', $title ) );
                 $skip = true;
             }
@@ -166,45 +171,17 @@ class Aquademi extends ExcelToCsv
                     $hash_duplicate = $duplicate_hashes[$vendor_hash_key];
                     $product_id = $hash_duplicate['first']['id'];
                     $duplicate  = var_export( $duplicate_hashes[$vendor_hash_key], true );
-                } else if ( isset( $hashed_products[$vendor_hash_key] ) ) {
-                    $product_id = $hashed_products[$vendor_hash_key]['id'];
                 } else if ( isset( $allArticles[$orig_article] ) ) {
                     $dictVendor = $allArticles[$orig_article]['vendor'];
-                    if ( ( $dictVendor == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $dictVendor == $this->vendor_synonym[$current_vendor] ) ) ) {
+                    if ( $dictVendor == $current_vendor ) {
                         $product_id = $allArticles[$orig_article]['product_id'];
                     }
+                } else if ( isset( $hashed_products[$vendor_hash_key] ) ) {
+                    $product_id = $hashed_products[$vendor_hash_key]['id'];
                 }
 
                 $result[$vendor_hash_key]['product_id'] = $product_id;
                 $result[$vendor_hash_key]['duplicate'] = $duplicate;
-
-                // $result[$key]['duplicate'] = ( isset( $duplicate_hashes[$hash] ) ) ? implode( ', ', $duplicate_hashes[$hash]) : '';
-                /*if ( isset( $duplicate_hashes[$vendor_hash_key] ) ) {
-                    $hash_duplicate = $duplicate_hashes[$vendor_hash_key];
-                    foreach ( $hash_duplicate as $item ) {
-                        $tmp_vend = mb_strtolower( $item['vendor'] );
-                        if ( ( $tmp_vend == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $tmp_vend == $this->vendor_synonym[$current_vendor] ) ) ) {
-                            $product_id = $item['id'];
-                        }
-                    }
-
-                }
-                if ( $product_id ) {
-                    $result[$vendor_hash_key]['product_id'] = $product_id;
-                    $result[$vendor_hash_key]['duplicate'] = '';
-                } else {
-                    $result[$vendor_hash_key]['duplicate'] = ( isset( $duplicate_hashes[$vendor_hash_key] ) ) ? var_export( $duplicate_hashes[$vendor_hash_key], true ) : '';
-                    if ( isset( $hashed_products[$vendor_hash_key] ) ) {
-                        $result[$vendor_hash_key]['product_id'] = $hashed_products[$vendor_hash_key]['id'];
-                    } else if ( isset( $allArticles[$orig_article] ) ) {
-                        $dictVendor = $allArticles[$orig_article]['vendor'];
-                        if ( ( $dictVendor == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $dictVendor == $this->vendor_synonym[$current_vendor] ) ) ) {
-                            $result[$vendor_hash_key]['product_id'] = $allArticles[$orig_article]['product_id'];
-                        }
-                    } else {
-                        $result[$vendor_hash_key]['product_id'] = '';
-                    };
-                }*/
             }
 
         }

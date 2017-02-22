@@ -1,17 +1,19 @@
 <div>
     <div class="dictionary-list">
-        <div class="row">
+        <div class="row header-row">
             <div class="col-xs-1">ID</div>
-            <div class="col-xs-4">Производитель (произвольно)</div>
-            <div class="col-xs-4">КОД (прописью, значение из базы)</div>
+            <div class="col-xs-3">Заголовок</div>
+            <div class="col-xs-3">КОД в прайсе</div>
+            <div class="col-xs-3">КОД robins</div>
             <div class="col-xs-2"></div>
         </div>
         <div class="vendor-list">
             <?php foreach ($data['vendors'] as $key => $val) { ?>
                 <div class="row"  data-id="<?php echo $val['id']; ?>">
                     <div class="col-xs-1"><?php echo $val['id']; ?></div>
-                    <div class="col-xs-4"><?php echo $val['title']; ?></div>
-                    <div class="col-xs-4"><?php echo $val['code']; ?></div>
+                    <div class="col-xs-3"><?php echo $val['title']; ?></div>
+                    <div class="col-xs-3"><?php echo $val['code_price']; ?></div>
+                    <div class="col-xs-3"><?php echo $val['code_robins']; ?></div>
                     <div class="col-xs-2">
                         <button type="button" class="btn btn-danger vendor-delete" data-id="<?php echo $val['id']; ?>">Удалить</button>
                     </div>
@@ -34,12 +36,16 @@
             <div class="modal-body">
                 <form id="new-dictionary-vendor">
                     <div class="form-group">
-                        <label for="new-vendor">Производитель (название, произвольно)</label>
+                        <label for="new-vendor">Заголовок (название, произвольно)</label>
                         <input type="text" class="form-control" id="new-vendor" name="title" placeholder="Duka super title">
                     </div>
                     <div class="form-group">
-                        <label for="new-vendor-code">КОД (прописью, значение из базы)</label>
-                        <input type="text" class="form-control" id="new-vendor-code" name="code" placeholder="duka">
+                        <label for="new-vendor-code">КОД в прайсе</label>
+                        <input type="text" class="form-control" id="new-vendor-code-price" name="code_price" placeholder="duka new">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-vendor-code">КОД robins (прописью, значение из базы ROBINS)</label>
+                        <input type="text" class="form-control" id="new-vendor-code-robins" name="code_robins" placeholder="duka">
                     </div>
                 </form>
             </div>

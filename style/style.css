@@ -98,6 +98,32 @@ table, th, td {
     border-left: none;
 }
 
+
+.dictionary-list .header-row{
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: #eb9316;
+}
+.dictionary-list div .row:nth-child(odd){
+    background-color: #efefef;
+}
+
+.dictionary-list div .row {
+    padding: 5px 0;
+    line-height: 34px;
+}
+.dictionary-list div .row>div{
+    border-left: 1px solid;
+    word-wrap: break-word;
+}
+
+.dictionary-list div .row>div:first-child{
+    border-left: none;
+}
+.dictionary-list div .row:hover{
+    background-color: #5bc0de;
+}
+
 .add-item-btn-fixed {
     position: fixed;
     bottom: 20px;
