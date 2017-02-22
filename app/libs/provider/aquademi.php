@@ -4,14 +4,6 @@ class Aquademi extends ExcelToCsv
 {
     private $vendors = [];
 
-    private $vendor_synonym = [
-        'axor' => 'hansgrohe',
-        'hansgrohe' => 'axor',
-        'grohe diy' => 'grohe',
-        'grohe spa' => 'grohe',
-        'instal-projekt' => 'install projekt'
-    ];
-
     private $blocks = [ 'Основной', 'Склад №2', 'Распродажа' ];
     private $skip_blocks = [ 'Распродажа' ];
 
@@ -119,10 +111,6 @@ class Aquademi extends ExcelToCsv
                         break;
                 }
 
-            }
-
-            if($current_vendor == 'huppe'){
-                $qwer = 0;
             }
 
             if( !$current_block_type || !in_array($current_block_type, $this->blocks) || in_array($current_block_type, $this->skip_blocks) ) {

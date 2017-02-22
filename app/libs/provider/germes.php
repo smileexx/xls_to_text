@@ -7,8 +7,6 @@ class Germes extends ExcelToCsv
 
     private $vendors = [];
 
-    private $vendor_synonym = [];
-
     function process( $file, $hashed_products, $duplicate_hashes )
     {
         // settings
@@ -16,9 +14,6 @@ class Germes extends ExcelToCsv
 
         $first_row = 10;
         $last_row = 0;
-
-//        $first_column = 1;
-//        $last_column = 0;
 
         $columns = [
             0 => [
@@ -61,7 +56,7 @@ class Germes extends ExcelToCsv
         $modelXml = new Model_Xml();
         $tmpArrVendors = $modelXml->getAllVendors();
         foreach ($tmpArrVendors as $val){
-            $this->vendors[] = $val['code'];
+            $this->vendors[$val['code_price']] = $val['code_robins'];
         }
         $allArticles = $modelXml->getAllArticles();
 
@@ -111,10 +106,8 @@ class Germes extends ExcelToCsv
                         break;
                     case 'vendor':
                         $tmp_vendor = trim( mb_strtolower($formated_value, 'UTF-8') );
-                        if( in_array($tmp_vendor, $this->vendors) ) {
-                            $current_vendor = $tmp_vendor;
-                        } else if ( isset( $this->vendor_synonym[$tmp_vendor] ) ){
-                            $current_vendor = $this->vendor_synonym[$tmp_vendor];
+                        if( isset( $this->vendors[$tmp_vendor] ) ) {
+                            $current_vendor = $this->vendors[$tmp_vendor];
                         }
                         break;
                     default:
@@ -127,7 +120,7 @@ class Germes extends ExcelToCsv
             }
 
             $skip = false;
-            if( !$current_vendor || !in_array($current_vendor, $this->vendors) ){
+            if( !$current_vendor ){
                 $result_skip[] = sprintf("[Vendor] %s  | Article: %s  | Hash: %s  | Title: %s<br>".PHP_EOL, $tmp_vendor, $orig_article, $hash, implode( ', ', $title ) );
                 $skip = true;
             }
@@ -168,13 +161,13 @@ class Germes extends ExcelToCsv
                     $hash_duplicate = $duplicate_hashes[$vendor_hash_key];
                     $product_id = $hash_duplicate['first']['id'];
                     $duplicate  = var_export( $duplicate_hashes[$vendor_hash_key], true );
-                } else if ( isset( $hashed_products[$vendor_hash_key] ) ) {
-                    $product_id = $hashed_products[$vendor_hash_key]['id'];
                 } else if ( isset( $allArticles[$orig_article] ) ) {
                     $dictVendor = $allArticles[$orig_article]['vendor'];
-                    if ( ( $dictVendor == $current_vendor ) || ( isset( $this->vendor_synonym[$current_vendor] ) && ( $dictVendor == $this->vendor_synonym[$current_vendor] ) ) ) {
+                    if ( $dictVendor == $current_vendor ) {
                         $product_id = $allArticles[$orig_article]['product_id'];
                     }
+                } else if ( isset( $hashed_products[$vendor_hash_key] ) ) {
+                    $product_id = $hashed_products[$vendor_hash_key]['id'];
                 }
 
                 $result[$vendor_hash_key]['product_id'] = $product_id;
